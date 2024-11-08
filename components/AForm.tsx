@@ -388,7 +388,7 @@ function MultiStepFormWithTabs() {
                 onClick={formMethods.handleSubmit(onSubmit)}
                 disabled={!validity}
               >
-                Save and Submit
+                Submit
               </Button>
             )}
           </CardFooter>
