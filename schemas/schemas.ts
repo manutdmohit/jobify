@@ -1,11 +1,17 @@
 // schemas.ts
 import { z } from 'zod';
 
+// export const personalInfoSchema = z.object({
+//   fullName: z.string().optional(),
+//   email: z.string().optional(),
+//   // address: z.string().min(1, 'Address is required'),
+//   phone: z.string().optional(),
+// });
 export const personalInfoSchema = z.object({
   fullName: z.string().min(2, 'Full Name is required'),
   email: z.string().email(),
-  address: z.string().min(1, 'Address is required'),
   phone: z.string().regex(/^\d+$/, 'Invalid Number!'),
+  address: z.string().min(1, 'Address is required'),
 });
 
 export const educationSchema = z.object({

@@ -14,12 +14,10 @@ import { Button } from '@/components/ui/button';
 import {
   Card,
   CardContent,
-  CardDescription,
   CardFooter,
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { Checkbox } from '@/components/ui/checkbox';
 import {
   Form,
   FormControl,
@@ -30,89 +28,169 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-import { Textarea } from '@/components/ui/textarea';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
 
-type Step = 0 | 1 | 2; // Define the possible steps
-
-function MultiStepForm() {
+function MultiStepFormWithTabs() {
   const router = useRouter();
   const { toast } = useToast();
 
-  const [step, setStep] = useState<Step>(0);
+  const [currentStep, setCurrentStep] = useState(0);
   const [formData, setFormData] = useState<Partial<CombinedFormData>>({});
 
   const formSchemas = [personalInfoSchema, educationSchema, skillsSchema];
-  const currentSchema = formSchemas[step];
-
   const formMethods = useForm<CombinedFormData>({
-    resolver: zodResolver(currentSchema),
-    defaultValues: formData, // Persist data across steps
+    resolver: zodResolver(formSchemas[currentStep]),
+    defaultValues: formData,
   });
+  0;
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = formMethods;
+  const { isValid, errors } = formMethods.formState; // formState is a zod hook
 
-  const onNext: SubmitHandler<CombinedFormData> = (data) => {
-    setFormData((prev) => ({ ...prev, ...data }));
-    setStep((prev) => (prev + 1) as Step);
-  };
+  const formValues = formMethods.getValues();
 
-  const onPrevious = () => {
-    setStep((prev) => (prev - 1) as Step);
-  };
+  // Access the field values directly
+  const fullName = formValues.fullName;
+  const email = formValues.email;
+  const phone = formValues.phone;
 
-  const onSubmit: SubmitHandler<CombinedFormData> = (data) => {
+  const validity = !fullName || !email || !phone ? false : true;
+
+  const onSubmit: SubmitHandler<CombinedFormData> = async (data) => {
     const finalData = { ...formData, ...data };
     console.log('Final Submission Data: ', finalData);
 
-    toast({
-      title: 'Success',
-      description: 'Your form has been submitted successfully.',
-    });
+    // Trigger validation for all fields
+    const isValid = await formMethods.trigger();
 
-    // Reset the form and then navigate
-    formMethods.reset();
-    setStep(0);
+    if (isValid) {
+      toast({
+        title: 'Success',
+        description: 'Your action was successful.',
+      });
 
-    router.push('/');
+      formMethods.reset();
+      router.push('/');
+      setCurrentStep(0);
+    }
   };
+
+  const handleNext = async () => {
+    const isValid = await formMethods.trigger(); // Manually trigger validation
+
+    if (isValid && currentStep < formSchemas.length - 1) {
+      setFormData((prev) => ({ ...prev, ...formMethods.getValues() })); // Update formData with valid values
+      setCurrentStep((prev) => prev + 1); // Move to next step
+    }
+  };
+
+  const handlePrev = () => {
+    if (currentStep > 0) {
+      setFormData((prev) => ({ ...prev, ...formMethods.getValues() }));
+      setCurrentStep((prev) => prev - 1);
+    }
+  };
+
+  const isLastStep = currentStep === formSchemas.length - 1;
 
   return (
     <FormProvider {...formMethods}>
-      <form
-        onSubmit={handleSubmit(
-          step < formSchemas.length - 1 ? onNext : onSubmit
-        )}
-        className="flex flex-col gap-4 min-h-screen items-center justify-center max-w-7xl mx-auto p-6 bg-gray-100"
+      <Tabs
+        value={`step${currentStep}`}
+        onValueChange={(value) =>
+          setCurrentStep(Number(value.replace('step', '')))
+        }
+        className="flex flex-col gap-4 min-h-screen items-center justify-center max-w-full mx-auto p-6 bg-gray-100"
       >
-        <Card className="w-full max-w-md">
+        <Card className="w-full max-w-lg my-5">
           <CardHeader>
             <CardTitle>Application Form</CardTitle>
-            <CardDescription>
-              {step === 0
-                ? 'Fill out your personal information'
-                : step === 1
-                ? 'Enter your educational details'
-                : 'Add your skills'}
-            </CardDescription>
           </CardHeader>
 
+          <TabsList className="gap-4">
+            <TabsTrigger value="step0">Personal Info</TabsTrigger>
+            <TabsTrigger value="step1">Education</TabsTrigger>
+            <TabsTrigger value="step2">Skills</TabsTrigger>
+          </TabsList>
+
           <CardContent>
-            {step === 0 && (
+            <TabsContent value="step0">
               <div className="flex flex-col gap-4">
                 <h2 className="text-lg font-semibold">Personal Information</h2>
+                {/* <FormField
+                  control={formMethods.control}
+                  name="fullName"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Full Name</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="Your Full Name"
+                          type="text"
+                          {...field}
+                          required
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={formMethods.control}
+                  name="email"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Email</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="Your Email"
+                          type="email"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={formMethods.control}
+                  name="phone"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Phone Number</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="Your Phone Number"
+                          type="tel"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={formMethods.control}
+                  name="address"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Address</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="Your Address"
+                          type="text"
+                          {...field}
+                          required
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                /> */}
+
                 <FormField
                   control={formMethods.control}
                   name="fullName"
@@ -126,6 +204,7 @@ function MultiStepForm() {
                           {...field}
                         />
                       </FormControl>
+                      <FormDescription>Provide your full name</FormDescription>
                       <FormMessage />
                     </FormItem>
                   )}
@@ -143,6 +222,9 @@ function MultiStepForm() {
                           {...field}
                         />
                       </FormControl>
+                      <FormDescription>
+                        Provide your email address
+                      </FormDescription>
                       <FormMessage />
                     </FormItem>
                   )}
@@ -160,6 +242,7 @@ function MultiStepForm() {
                           {...field}
                         />
                       </FormControl>
+                      <FormDescription>Provide your address</FormDescription>
                       <FormMessage />
                     </FormItem>
                   )}
@@ -177,14 +260,17 @@ function MultiStepForm() {
                           {...field}
                         />
                       </FormControl>
+                      <FormDescription>
+                        Provide your phone number
+                      </FormDescription>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
               </div>
-            )}
+            </TabsContent>
 
-            {step === 1 && (
+            <TabsContent value="step1">
               <div className="flex flex-col gap-4">
                 <h2 className="text-lg font-semibold">Education</h2>
                 <FormField
@@ -226,7 +312,7 @@ function MultiStepForm() {
                   name="yearOfGraduation"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Year of Graduation</FormLabel>
+                      <FormLabel>Graduation Year</FormLabel>
                       <FormControl>
                         <Input
                           placeholder="Year of Graduation"
@@ -239,9 +325,9 @@ function MultiStepForm() {
                   )}
                 />
               </div>
-            )}
+            </TabsContent>
 
-            {step === 2 && (
+            <TabsContent value="step2">
               <div className="flex flex-col gap-4">
                 <h2 className="text-lg font-semibold">Skills</h2>
                 <FormField
@@ -252,7 +338,7 @@ function MultiStepForm() {
                       <FormControl>
                         <Checkbox
                           checked={field.value}
-                          // onCheckedChange={handleCheckboxChange(field.onChange)} // Correctly handle checkbox state change
+                          onCheckedChange={field.onChange}
                         />
                       </FormControl>
                       <FormLabel>Classroom Management</FormLabel>
@@ -267,51 +353,49 @@ function MultiStepForm() {
                       <FormControl>
                         <Checkbox
                           checked={field.value}
-                          // onCheckedChange={handleCheckboxChange(field.onChange)}
+                          onCheckedChange={field.onChange}
                         />
                       </FormControl>
-                      <FormLabel>Lesson Planning</FormLabel>
+                      <FormLabel>Communication</FormLabel>
                     </FormItem>
                   )}
                 />
-
                 <FormField
                   control={formMethods.control}
-                  name="assessmentTechniques"
+                  name="curriculumDevelopment"
                   render={({ field }) => (
                     <FormItem className="flex items-center space-x-2">
                       <FormControl>
                         <Checkbox
                           checked={field.value}
-                          // onCheckedChange={handleCheckboxChange(field.onChange)}
+                          onCheckedChange={field.onChange}
                         />
                       </FormControl>
-                      <FormLabel>Assessment Techniques</FormLabel>
+                      <FormLabel>Curriculum Development</FormLabel>
                     </FormItem>
                   )}
                 />
               </div>
-            )}
+            </TabsContent>
           </CardContent>
 
           <CardFooter className="flex justify-between">
-            {step > 0 && (
-              <Button type="button" onClick={onPrevious}>
-                Previous
-              </Button>
-            )}
-            {step < formSchemas.length - 1 ? (
-              <Button type="button" onClick={handleSubmit(onNext)}>
-                Next
-              </Button>
+            {currentStep > 0 && <Button onClick={handlePrev}>Previous</Button>}
+            {!isLastStep ? (
+              <Button onClick={handleNext}>Next</Button>
             ) : (
-              <Button type="submit">Submit</Button>
+              <Button
+                onClick={formMethods.handleSubmit(onSubmit)}
+                disabled={!validity}
+              >
+                Save and Submit
+              </Button>
             )}
           </CardFooter>
         </Card>
-      </form>
+      </Tabs>
     </FormProvider>
   );
 }
 
-export default MultiStepForm;
+export default MultiStepFormWithTabs;
