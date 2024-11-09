@@ -47,8 +47,7 @@ function MultiStepFormWithTabs() {
   });
   0;
 
-  const { isValid, errors } = formMethods.formState; // formState is a zod hook
-
+  // Get Form Values
   const formValues = formMethods.getValues();
 
   // Access the field values directly
@@ -62,19 +61,14 @@ function MultiStepFormWithTabs() {
     const finalData = { ...formData, ...data };
     console.log('Final Submission Data: ', finalData);
 
-    // Trigger validation for all fields
-    const isValid = await formMethods.trigger();
+    toast({
+      title: 'Success',
+      description: 'Your action was successful.',
+    });
 
-    if (isValid) {
-      toast({
-        title: 'Success',
-        description: 'Your action was successful.',
-      });
-
-      formMethods.reset();
-      router.push('/');
-      setCurrentStep(0);
-    }
+    formMethods.reset();
+    router.push('/');
+    setCurrentStep(0);
   };
 
   const handleNext = async () => {
