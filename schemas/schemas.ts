@@ -32,13 +32,30 @@ export const skillsSchema = z.object({
   assessmentTechniques: z.boolean().optional(),
 });
 
+// Convert referencesSchema to an object containing an array
+export const completeReferenceSchema = z.object({
+  references: z
+    .array(
+      z.object({
+        name: z.string().optional(),
+        title: z.string().optional(),
+        organization: z.string().optional(),
+        contactInfo: z.string().optional(),
+      })
+    )
+    .length(2),
+});
+
 // Combine schemas for final validation
 export const combinedSchema = personalInfoSchema
   .merge(educationSchema)
-  .merge(skillsSchema);
+  .merge(skillsSchema)
+  .merge(completeReferenceSchema);
 
 // Types for each form step
 export type PersonalInfo = z.infer<typeof personalInfoSchema>;
 export type Education = z.infer<typeof educationSchema>;
 export type Skills = z.infer<typeof skillsSchema>;
-export type CombinedFormData = PersonalInfo & Education & Skills;
+export type References = z.infer<typeof completeReferenceSchema>;
+
+export type CombinedFormData = PersonalInfo & Education & Skills & References;
