@@ -7,8 +7,9 @@ import {
   personalInfoSchema,
   educationSchema,
   skillsSchema,
-  CombinedFormData,
+  certificationsSchema,
   completeReferenceSchema,
+  CombinedFormData,
 } from '@/schemas/schemas';
 
 import { Button } from '@/components/ui/button';
@@ -31,6 +32,14 @@ import {
 import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+
 import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
@@ -41,9 +50,23 @@ function MultiStepFormWithTabs() {
 
   const [currentStep, setCurrentStep] = useState(0);
   const [formData, setFormData] = useState<Partial<CombinedFormData>>({
+    fullName: '',
+    email: '',
     references: [
       { name: '', title: '', organization: '', contactInfo: '' },
       { name: '', title: '', organization: '', contactInfo: '' },
+    ],
+    certifications: [
+      {
+        certificationName: '',
+        certifyingOrganization: '',
+        yearOfCertification: '',
+      },
+      {
+        certificationName: '',
+        certifyingOrganization: '',
+        yearOfCertification: '',
+      },
     ],
   });
 
@@ -52,6 +75,7 @@ function MultiStepFormWithTabs() {
     educationSchema,
     skillsSchema,
     completeReferenceSchema,
+    certificationsSchema,
   ];
   const formMethods = useForm<CombinedFormData>({
     resolver: zodResolver(formSchemas[currentStep]),
@@ -105,9 +129,15 @@ function MultiStepFormWithTabs() {
     <FormProvider {...formMethods}>
       <Tabs
         value={`step${currentStep}`}
-        onValueChange={(value) =>
-          setCurrentStep(Number(value.replace('step', '')))
-        }
+        onValueChange={(value) => {
+          // Save current form data when a tab is clicked
+          setFormData((prev) => ({
+            ...prev,
+            ...formMethods.getValues(), // Merges current form values into formData
+          }));
+          // Update the current step based on the clicked tab
+          setCurrentStep(Number(value.replace('step', '')));
+        }}
         className="flex flex-col gap-4 min-h-screen items-center justify-center max-w-full mx-auto p-6 bg-gray-100"
       >
         <Card className="w-full max-w-7xl my-5">
@@ -127,7 +157,7 @@ function MultiStepFormWithTabs() {
               <TabsTrigger value="step1">Education</TabsTrigger>
               <TabsTrigger value="step2">Skills</TabsTrigger>
               <TabsTrigger value="step3">References</TabsTrigger>
-              <TabsTrigger value="step4">Test</TabsTrigger>
+              <TabsTrigger value="step4">Certifications</TabsTrigger>
             </TabsList>
           </div>
 
@@ -236,13 +266,36 @@ function MultiStepFormWithTabs() {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Degree</FormLabel>
-                      <FormControl>
+                      {/* <FormControl>
                         <Input
                           placeholder="Your Degree"
                           type="text"
                           {...field}
                         />
-                      </FormControl>
+                      </FormControl> */}
+                      <Select
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select a a degree" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="Not Applicable">
+                            {' '}
+                            Not Applicable{' '}
+                          </SelectItem>
+                          <SelectItem value="Master's Degree">
+                            Master's Degree
+                          </SelectItem>
+                          <SelectItem value="Bachelor's Degree">
+                            Bachelor's Degree
+                          </SelectItem>
+                          <SelectItem value="10+2">10+2</SelectItem>
+                        </SelectContent>
+                      </Select>
                       <FormMessage />
                     </FormItem>
                   )}
@@ -471,9 +524,76 @@ function MultiStepFormWithTabs() {
                 /> */}
               </motion.div>
             </TabsContent>
+
+            {/* Cerifications */}
+            <TabsContent value="step4">
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.5 }}
+                className="flex flex-col gap-4"
+              >
+                <h2 className="text-lg font-semibold">Certifications</h2>
+
+                {formMethods.getValues().certifications.map((_, index) => (
+                  <div key={index} className="mb-4">
+                    <h4 className="font-semibold">Certification {index + 1}</h4>
+
+                    <FormField
+                      control={formMethods.control}
+                      name={`certifications.${index}.certificationName`}
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Certification Name:</FormLabel>
+                          <FormControl>
+                            <Input
+                              placeholder="Certification Name"
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={formMethods.control}
+                      name={`certifications.${index}.certifyingOrganization`}
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Certifying Organization:</FormLabel>
+                          <FormControl>
+                            <Input
+                              placeholder="Certifying Organization Name"
+                              {...field}
+                            />
+                          </FormControl>
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={formMethods.control}
+                      name={`certifications.${index}.yearOfCertification`}
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Year of Certification:</FormLabel>
+                          <FormControl>
+                            <Input
+                              placeholder="Year of Certification"
+                              {...field}
+                            />
+                          </FormControl>
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                ))}
+              </motion.div>
+            </TabsContent>
           </CardContent>
 
-          <CardFooter className="flex justify-between">
+          <CardFooter className="gap-7">
             {currentStep > 0 && <Button onClick={handlePrev}>Previous</Button>}
             {!isLastStep ? (
               <Button onClick={handleNext}>Next</Button>
