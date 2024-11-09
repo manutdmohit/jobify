@@ -46,16 +46,35 @@ export const completeReferenceSchema = z.object({
     .length(2),
 });
 
+// Combine schemas for certifications
+export const certificationsSchema = z.object({
+  certifications: z
+    .array(
+      z.object({
+        certificationName: z.string().optional(),
+        certifyingOrganization: z.string().optional(),
+        yearOfCertification: z.string().optional(),
+      })
+    )
+    .length(2),
+});
+
 // Combine schemas for final validation
 export const combinedSchema = personalInfoSchema
   .merge(educationSchema)
   .merge(skillsSchema)
-  .merge(completeReferenceSchema);
+  .merge(completeReferenceSchema)
+  .merge(certificationsSchema);
 
 // Types for each form step
 export type PersonalInfo = z.infer<typeof personalInfoSchema>;
 export type Education = z.infer<typeof educationSchema>;
 export type Skills = z.infer<typeof skillsSchema>;
 export type References = z.infer<typeof completeReferenceSchema>;
+export type Certifications = z.infer<typeof certificationsSchema>;
 
-export type CombinedFormData = PersonalInfo & Education & Skills & References;
+export type CombinedFormData = PersonalInfo &
+  Education &
+  Skills &
+  References &
+  Certifications;
