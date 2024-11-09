@@ -8,6 +8,7 @@ import {
   educationSchema,
   skillsSchema,
   CombinedFormData,
+  completeReferenceSchema,
 } from '@/schemas/schemas';
 
 import { Button } from '@/components/ui/button';
@@ -32,18 +33,29 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
+import { motion } from 'framer-motion';
 
 function MultiStepFormWithTabs() {
   const router = useRouter();
   const { toast } = useToast();
 
   const [currentStep, setCurrentStep] = useState(0);
-  const [formData, setFormData] = useState<Partial<CombinedFormData>>({});
+  const [formData, setFormData] = useState<Partial<CombinedFormData>>({
+    references: [
+      { name: '', title: '', organization: '', contactInfo: '' },
+      { name: '', title: '', organization: '', contactInfo: '' },
+    ],
+  });
 
-  const formSchemas = [personalInfoSchema, educationSchema, skillsSchema];
+  const formSchemas = [
+    personalInfoSchema,
+    educationSchema,
+    skillsSchema,
+    completeReferenceSchema,
+  ];
   const formMethods = useForm<CombinedFormData>({
     resolver: zodResolver(formSchemas[currentStep]),
-    defaultValues: formData,
+    defaultValues: formData, // check here
   });
   0;
 
@@ -98,92 +110,36 @@ function MultiStepFormWithTabs() {
         }
         className="flex flex-col gap-4 min-h-screen items-center justify-center max-w-full mx-auto p-6 bg-gray-100"
       >
-        <Card className="w-full max-w-lg my-5">
-          <CardHeader>
-            <CardTitle>Application Form</CardTitle>
-          </CardHeader>
+        <Card className="w-full max-w-7xl my-5">
+          <motion.div
+            initial={{ opacity: 0, y: 50 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+          >
+            <CardHeader>
+              <CardTitle>Application Form</CardTitle>
+            </CardHeader>
+          </motion.div>
 
-          <TabsList className="gap-4">
-            <TabsTrigger value="step0">Personal Info</TabsTrigger>
-            <TabsTrigger value="step1">Education</TabsTrigger>
-            <TabsTrigger value="step2">Skills</TabsTrigger>
-          </TabsList>
+          <div className="overflow-x-auto">
+            <TabsList className="gap-1 md:gap-4 whitespace-nowrap">
+              <TabsTrigger value="step0">Personal Info</TabsTrigger>
+              <TabsTrigger value="step1">Education</TabsTrigger>
+              <TabsTrigger value="step2">Skills</TabsTrigger>
+              <TabsTrigger value="step3">References</TabsTrigger>
+              <TabsTrigger value="step4">Test</TabsTrigger>
+            </TabsList>
+          </div>
 
           <CardContent>
             <TabsContent value="step0">
-              <div className="flex flex-col gap-4">
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.5 }}
+                className="flex flex-col gap-4"
+              >
                 <h2 className="text-lg font-semibold">Personal Information</h2>
-                {/* <FormField
-                  control={formMethods.control}
-                  name="fullName"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Full Name</FormLabel>
-                      <FormControl>
-                        <Input
-                          placeholder="Your Full Name"
-                          type="text"
-                          {...field}
-                          required
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={formMethods.control}
-                  name="email"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Email</FormLabel>
-                      <FormControl>
-                        <Input
-                          placeholder="Your Email"
-                          type="email"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={formMethods.control}
-                  name="phone"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Phone Number</FormLabel>
-                      <FormControl>
-                        <Input
-                          placeholder="Your Phone Number"
-                          type="tel"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={formMethods.control}
-                  name="address"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Address</FormLabel>
-                      <FormControl>
-                        <Input
-                          placeholder="Your Address"
-                          type="text"
-                          {...field}
-                          required
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                /> */}
 
                 <FormField
                   control={formMethods.control}
@@ -261,11 +217,18 @@ function MultiStepFormWithTabs() {
                     </FormItem>
                   )}
                 />
-              </div>
+
+                <h2>Please fill all the necessary fields</h2>
+              </motion.div>
             </TabsContent>
 
             <TabsContent value="step1">
-              <div className="flex flex-col gap-4">
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.5 }}
+                className="flex flex-col gap-4"
+              >
                 <h2 className="text-lg font-semibold">Education</h2>
                 <FormField
                   control={formMethods.control}
@@ -318,11 +281,16 @@ function MultiStepFormWithTabs() {
                     </FormItem>
                   )}
                 />
-              </div>
+              </motion.div>
             </TabsContent>
 
             <TabsContent value="step2">
-              <div className="flex flex-col gap-4">
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.5 }}
+                className="flex flex-col gap-4"
+              >
                 <h2 className="text-lg font-semibold">Skills</h2>
                 <FormField
                   control={formMethods.control}
@@ -369,7 +337,139 @@ function MultiStepFormWithTabs() {
                     </FormItem>
                   )}
                 />
-              </div>
+              </motion.div>
+            </TabsContent>
+
+            <TabsContent value="step3">
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.5 }}
+                className="flex flex-col gap-4"
+              >
+                <h2 className="text-lg font-semibold">References</h2>
+
+                {formMethods.getValues().references.map((_, index) => (
+                  <div key={index} className="mb-4">
+                    <h4 className="font-semibold">Reference {index + 1}</h4>
+
+                    <FormField
+                      control={formMethods.control}
+                      name={`references.${index}.name`}
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Name:</FormLabel>
+                          <FormControl>
+                            <Input placeholder="Reference Name" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={formMethods.control}
+                      name={`references.${index}.title`}
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Title/Position:</FormLabel>
+                          <FormControl>
+                            <Input
+                              placeholder="Reference Title/Position"
+                              {...field}
+                            />
+                          </FormControl>
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={formMethods.control}
+                      name={`references.${index}.organization`}
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Organization:</FormLabel>
+                          <FormControl>
+                            <Input
+                              placeholder="Reference Organization"
+                              {...field}
+                            />
+                          </FormControl>
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={formMethods.control}
+                      name={`references.${index}.contactInfo`}
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Contact Information:</FormLabel>
+                          <FormControl>
+                            <Input
+                              placeholder="Reference Contact Information"
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                ))}
+
+                {/* <FormField
+                  control={formMethods.control}
+                  name="degree"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Degree</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="Your Degree"
+                          type="text"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={formMethods.control}
+                  name="institution"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Institution</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="Your Institution"
+                          type="text"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={formMethods.control}
+                  name="yearOfGraduation"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Graduation Year</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="Year of Graduation"
+                          type="number"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                /> */}
+              </motion.div>
             </TabsContent>
           </CardContent>
 
