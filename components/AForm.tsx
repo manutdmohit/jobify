@@ -603,9 +603,12 @@ function MultiStepFormWithTabs() {
                         <Checkbox
                           className="mt-2"
                           checked={field.value}
-                          onCheckedChange={handleCulturalKnowledgeCheckboxChange(
-                            field.onChange
-                          )}
+                          onCheckedChange={(checked: boolean) => {
+                            handleCulturalKnowledgeCheckboxChange(
+                              field.onChange
+                            )(checked);
+                            setIsLanguageChecked(checked);
+                          }}
                         />
                       </FormControl>
                       <FormLabel>
@@ -623,9 +626,12 @@ function MultiStepFormWithTabs() {
                         <Checkbox
                           className="mt-2"
                           checked={field.value}
-                          onCheckedChange={handleCulturalKnowledgeCheckboxChange(
-                            field.onChange
-                          )}
+                          onCheckedChange={(checked: boolean) => {
+                            handleCulturalKnowledgeCheckboxChange(
+                              field.onChange
+                            )(checked);
+                            setIsLanguageChecked(checked);
+                          }}
                         />
                       </FormControl>
                       <FormLabel>
