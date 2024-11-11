@@ -45,6 +45,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
 import { AnimatePresence, motion } from 'framer-motion';
+import { log } from 'console';
 
 function MultiStepFormWithTabs() {
   const router = useRouter();
@@ -122,6 +123,8 @@ function MultiStepFormWithTabs() {
   const address = formValues.address;
   const sop = formValues.statementOfPurpose;
 
+  console.log(sop.length);
+
   // Access nested field values
   const classroomManagement = formValues.teachingSkills?.classroomManagement;
   const lessonPlanning = formValues.teachingSkills?.lessonPlanning;
@@ -151,32 +154,36 @@ function MultiStepFormWithTabs() {
   // Check validity of personal info
   const personalInfoValidity = fullName && email && phone && address;
 
-  // Check validity of specific fields or sections
+  // Check validity of Teaching Skills
   const teachingSkillsValidity =
     classroomManagement ||
     lessonPlanning ||
     curriculumDevelopment ||
-    otherTeachingSkills;
+    Boolean(otherTeachingSkills);
 
+  // Check validity of Cultural Knowledge
   const culturalKnowledgeValidity =
-    knowledgeOfSpecificCultures ||
-    abilityToTeachCulturalValuesAndPerspectives ||
-    (fluencyInLanguages && languageDetails) ||
-    otherCulturalKnowledge;
+    Boolean(knowledgeOfSpecificCultures) ||
+    Boolean(abilityToTeachCulturalValuesAndPerspectives) ||
+    (fluencyInLanguages && Boolean(languageDetails)) ||
+    Boolean(otherCulturalKnowledge);
 
+  // Check validity of Interpersonal Skills
   const interpersonalSkillsValidity =
     communicationSkills ||
     empathy ||
     patience ||
     culturalSensitivity ||
-    otherInterpersonalSkills;
+    Boolean(otherInterpersonalSkills);
 
+  // Check validity of all skills
   const isSkillsValid =
     teachingSkillsValidity &&
     culturalKnowledgeValidity &&
     interpersonalSkillsValidity;
 
-  const validity = personalInfoValidity && sop && isSkillsValid;
+  // Check validity of all the required fields
+  const validity = personalInfoValidity && sop.length >= 50 && isSkillsValid;
 
   const onSubmit: SubmitHandler<CombinedFormData> = async (data) => {
     console.log('data', data);
@@ -478,6 +485,7 @@ function MultiStepFormWithTabs() {
 
             {/* Skills and Abilities */}
             <TabsContent value="step2">
+              {/* Teaching Skills */}
               <AnimatePresence mode="wait">
                 <motion.div
                   key="step2"
@@ -609,9 +617,11 @@ function MultiStepFormWithTabs() {
                         <Checkbox
                           className="mt-2"
                           checked={field.value}
-                          onCheckedChange={handleCulturalKnowledgeCheckboxChange(
-                            field.onChange
-                          )}
+                          onCheckedChange={(checked: boolean) => {
+                            handleCulturalKnowledgeCheckboxChange(
+                              field.onChange
+                            )(checked);
+                          }}
                         />
                       </FormControl>
                       <FormLabel>
@@ -629,9 +639,11 @@ function MultiStepFormWithTabs() {
                         <Checkbox
                           className="mt-2"
                           checked={field.value}
-                          onCheckedChange={handleCulturalKnowledgeCheckboxChange(
-                            field.onChange
-                          )}
+                          onCheckedChange={(checked: boolean) => {
+                            handleCulturalKnowledgeCheckboxChange(
+                              field.onChange
+                            )(checked);
+                          }}
                         />
                       </FormControl>
                       <FormLabel>
@@ -658,14 +670,8 @@ function MultiStepFormWithTabs() {
                             if (!checked) {
                               formMethods.setValue(
                                 'culturalKnowledge.languageDetails',
-                                undefined
+                                ' '
                               );
-                              formMethods.clearErrors(
-                                'culturalKnowledge.fluencyInLanguages'
-                              ); // Clears the error when any checkbox changes
-                              formMethods.clearErrors(
-                                'culturalKnowledge.languageDetails'
-                              ); // Clears the error when any checkbox changes
                             }
                           }}
                         />
