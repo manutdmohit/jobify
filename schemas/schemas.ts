@@ -49,7 +49,10 @@ export const skillsSchema = z.object({
         data.knowledgeOfSpecifiCulturesOrTraditions ||
         data.abilityToTeachCulturalValuesAndPerspectives ||
         data.fluencyInLanguages ||
+        data.fluencyInLanguages ||
+        data.languageDetails ||
         data.otherCulturalKnowledge, // Check if any cultural knowledge is selected or filled
+
       'Please select or fill in at least one cultural knowledge'
     ),
   interPersonalSkills: z
