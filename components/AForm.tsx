@@ -44,7 +44,7 @@ import { Textarea } from '@/components/ui/textarea';
 
 import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
-import { motion } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
 
 function MultiStepFormWithTabs() {
   const router = useRouter();
@@ -132,7 +132,10 @@ function MultiStepFormWithTabs() {
   const knowledgeOfSpecificCultures =
     formValues.culturalKnowledge?.knowledgeOfSpecifiCulturesOrTraditions;
   const fluencyInLanguages = formValues.culturalKnowledge?.fluencyInLanguages;
+  const abilityToTeachCulturalValuesAndPerspectives =
+    formValues.culturalKnowledge?.abilityToTeachCulturalValuesAndPerspectives;
   const languageDetails = formValues.culturalKnowledge?.languageDetails;
+
   const otherCulturalKnowledge =
     formValues.culturalKnowledge?.otherCulturalKnowledge;
 
@@ -157,7 +160,7 @@ function MultiStepFormWithTabs() {
 
   const culturalKnowledgeValidity =
     knowledgeOfSpecificCultures ||
-    fluencyInLanguages ||
+    abilityToTeachCulturalValuesAndPerspectives ||
     languageDetails ||
     otherCulturalKnowledge;
 
@@ -271,300 +274,323 @@ function MultiStepFormWithTabs() {
           </div>
 
           <CardContent>
+            {/* Personal Information */}
             <TabsContent value="step0">
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.5 }}
-                className="flex flex-col gap-4"
-              >
-                <h2 className="text-lg font-semibold">Personal Information</h2>
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key="step0" // Set a unique key for each step to help with transition
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: 20 }}
+                  transition={{ duration: 0.5 }}
+                  className="flex flex-col gap-4"
+                >
+                  <h2 className="text-lg font-semibold">
+                    Personal Information
+                  </h2>
 
-                <FormField
-                  control={formMethods.control}
-                  name="fullName"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Full Name</FormLabel>
-                      <FormControl>
-                        <Input
-                          placeholder="Your Full Name"
-                          type="text"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormDescription>Provide your full name</FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={formMethods.control}
-                  name="email"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Email</FormLabel>
-                      <FormControl>
-                        <Input
-                          placeholder="john@doe.com"
-                          type="email"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormDescription>
-                        Provide your email address
-                      </FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={formMethods.control}
-                  name="address"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Address</FormLabel>
-                      <FormControl>
-                        <Input
-                          placeholder="Your Address"
-                          type="text"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormDescription>Provide your address</FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={formMethods.control}
-                  name="phone"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Phone</FormLabel>
-                      <FormControl>
-                        <Input
-                          placeholder="Your Phone Number"
-                          type="tel"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormDescription>
-                        Provide your phone number
-                      </FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                  <FormField
+                    control={formMethods.control}
+                    name="fullName"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Full Name</FormLabel>
+                        <FormControl>
+                          <Input
+                            placeholder="Your Full Name"
+                            type="text"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormDescription>
+                          Provide your full name
+                        </FormDescription>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={formMethods.control}
+                    name="email"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Email</FormLabel>
+                        <FormControl>
+                          <Input
+                            placeholder="john@doe.com"
+                            type="email"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormDescription>
+                          Provide your email address
+                        </FormDescription>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={formMethods.control}
+                    name="address"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Address</FormLabel>
+                        <FormControl>
+                          <Input
+                            placeholder="Your Address"
+                            type="text"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormDescription>Provide your address</FormDescription>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={formMethods.control}
+                    name="phone"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Phone</FormLabel>
+                        <FormControl>
+                          <Input
+                            placeholder="Your Phone Number"
+                            type="tel"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormDescription>
+                          Provide your phone number
+                        </FormDescription>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
 
-                <h2>Please fill all the necessary fields</h2>
-              </motion.div>
+                  <h2>Please fill all the necessary fields</h2>
+                </motion.div>
+              </AnimatePresence>
             </TabsContent>
 
+            {/* Education */}
             <TabsContent value="step1">
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.5 }}
-                className="flex flex-col gap-4"
-              >
-                <h2 className="text-lg font-semibold">Education</h2>
-                <FormField
-                  control={formMethods.control}
-                  name="degree"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Degree</FormLabel>
-                      <Select
-                        onValueChange={field.onChange}
-                        defaultValue={field.value}
-                      >
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select a a degree" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <SelectItem value="Not Applicable">
-                            {' '}
-                            Not Applicable{' '}
-                          </SelectItem>
-                          <SelectItem value="Master's Degree">
-                            Master's Degree
-                          </SelectItem>
-                          <SelectItem value="Bachelor's Degree">
-                            Bachelor's Degree
-                          </SelectItem>
-                          <SelectItem value="10+2">10+2</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={formMethods.control}
-                  name="institution"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Institution</FormLabel>
-                      <FormControl>
-                        <Input
-                          placeholder="Your Institution Name"
-                          type="text"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={formMethods.control}
-                  name="yearOfGraduation"
-                  render={({ field }) => {
-                    // Generate an array of years from the current year down to 1980
-                    const currentYear = new Date().getFullYear();
-                    const years = Array.from(
-                      { length: currentYear - 1980 + 1 },
-                      (_, i) => currentYear - i
-                    );
-
-                    return (
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key="step1"
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: 20 }}
+                  transition={{ duration: 0.5 }}
+                  className="flex flex-col gap-4"
+                >
+                  <h2 className="text-lg font-semibold">Education</h2>
+                  <FormField
+                    control={formMethods.control}
+                    name="degree"
+                    render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Year of Graduation</FormLabel>
+                        <FormLabel>Degree</FormLabel>
                         <Select
                           onValueChange={field.onChange}
                           defaultValue={field.value}
                         >
                           <FormControl>
                             <SelectTrigger>
-                              <SelectValue placeholder="Select year" />
+                              <SelectValue placeholder="Select a a degree" />
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            {years.map((year) => (
-                              <SelectItem key={year} value={year.toString()}>
-                                {year}
-                              </SelectItem>
-                            ))}
+                            <SelectItem value="Not Applicable">
+                              {' '}
+                              Not Applicable{' '}
+                            </SelectItem>
+                            <SelectItem value="Master's Degree">
+                              Master's Degree
+                            </SelectItem>
+                            <SelectItem value="Bachelor's Degree">
+                              Bachelor's Degree
+                            </SelectItem>
+                            <SelectItem value="10+2">10+2</SelectItem>
                           </SelectContent>
                         </Select>
                         <FormMessage />
                       </FormItem>
-                    );
-                  }}
-                />
-              </motion.div>
+                    )}
+                  />
+                  <FormField
+                    control={formMethods.control}
+                    name="institution"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Institution</FormLabel>
+                        <FormControl>
+                          <Input
+                            placeholder="Your Institution Name"
+                            type="text"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={formMethods.control}
+                    name="yearOfGraduation"
+                    render={({ field }) => {
+                      // Generate an array of years from the current year down to 1980
+                      const currentYear = new Date().getFullYear();
+                      const years = Array.from(
+                        { length: currentYear - 1980 + 1 },
+                        (_, i) => currentYear - i
+                      );
+
+                      return (
+                        <FormItem>
+                          <FormLabel>Year of Graduation</FormLabel>
+                          <Select
+                            onValueChange={field.onChange}
+                            defaultValue={field.value}
+                          >
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Select year" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              {years.map((year) => (
+                                <SelectItem key={year} value={year.toString()}>
+                                  {year}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      );
+                    }}
+                  />
+                </motion.div>
+              </AnimatePresence>
             </TabsContent>
 
+            {/* Skills and Abilities */}
             <TabsContent value="step2">
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.5 }}
-                className="flex flex-col mb-4 gap-4"
-              >
-                <h2 className="text-lg font-semibold">Teaching Skills</h2>
-                <FormField
-                  control={formMethods.control}
-                  name="teachingSkills.classroomManagement"
-                  render={({ field }) => (
-                    <FormItem className="flex items-center space-x-2">
-                      <FormControl>
-                        <Checkbox
-                          className="mt-2"
-                          checked={field.value}
-                          onCheckedChange={handleTeachingSkillsCheckboxChange(
-                            field.onChange
-                          )}
-                        />
-                      </FormControl>
-                      <FormLabel>Classroom Management</FormLabel>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={formMethods.control}
-                  name="teachingSkills.lessonPlanning"
-                  render={({ field }) => (
-                    <FormItem className="flex items-center space-x-2">
-                      <FormControl>
-                        <Checkbox
-                          className="mt-2"
-                          checked={field.value}
-                          onCheckedChange={handleTeachingSkillsCheckboxChange(
-                            field.onChange
-                          )}
-                        />
-                      </FormControl>
-                      <FormLabel>Communication</FormLabel>
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={formMethods.control}
-                  name="teachingSkills.curriculumDevelopment"
-                  render={({ field }) => (
-                    <FormItem className="flex items-center space-x-2">
-                      <FormControl>
-                        <Checkbox
-                          className="mt-2"
-                          checked={field.value}
-                          onCheckedChange={handleTeachingSkillsCheckboxChange(
-                            field.onChange
-                          )}
-                        />
-                      </FormControl>
-                      <FormLabel>Curriculum Development</FormLabel>
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={formMethods.control}
-                  name="teachingSkills.assessmentTechniques"
-                  render={({ field }) => (
-                    <FormItem className="flex items-center space-x-2">
-                      <FormControl>
-                        <Checkbox
-                          className="mt-2"
-                          checked={field.value}
-                          onCheckedChange={handleTeachingSkillsCheckboxChange(
-                            field.onChange
-                          )}
-                        />
-                      </FormControl>
-                      <FormLabel>Assessment Techniques</FormLabel>
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={formMethods.control}
-                  name="teachingSkills.otherTeachingSkills"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>If any other, please mention:</FormLabel>
-                      <FormControl>
-                        <Input
-                          placeholder="Other Teaching Skills"
-                          type="text"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key="step2"
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: 20 }}
+                  transition={{ duration: 0.5 }}
+                  className="flex flex-col mb-4 gap-4"
+                >
+                  <h2 className="text-lg font-semibold">Teaching Skills</h2>
+                  <FormField
+                    control={formMethods.control}
+                    name="teachingSkills.classroomManagement"
+                    render={({ field }) => (
+                      <FormItem className="flex items-center space-x-2">
+                        <FormControl>
+                          <Checkbox
+                            className="mt-2"
+                            checked={field.value}
+                            onCheckedChange={handleTeachingSkillsCheckboxChange(
+                              field.onChange
+                            )}
+                          />
+                        </FormControl>
+                        <FormLabel>Classroom Management</FormLabel>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={formMethods.control}
+                    name="teachingSkills.lessonPlanning"
+                    render={({ field }) => (
+                      <FormItem className="flex items-center space-x-2">
+                        <FormControl>
+                          <Checkbox
+                            className="mt-2"
+                            checked={field.value}
+                            onCheckedChange={handleTeachingSkillsCheckboxChange(
+                              field.onChange
+                            )}
+                          />
+                        </FormControl>
+                        <FormLabel>Communication</FormLabel>
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={formMethods.control}
+                    name="teachingSkills.curriculumDevelopment"
+                    render={({ field }) => (
+                      <FormItem className="flex items-center space-x-2">
+                        <FormControl>
+                          <Checkbox
+                            className="mt-2"
+                            checked={field.value}
+                            onCheckedChange={handleTeachingSkillsCheckboxChange(
+                              field.onChange
+                            )}
+                          />
+                        </FormControl>
+                        <FormLabel>Curriculum Development</FormLabel>
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={formMethods.control}
+                    name="teachingSkills.assessmentTechniques"
+                    render={({ field }) => (
+                      <FormItem className="flex items-center space-x-2">
+                        <FormControl>
+                          <Checkbox
+                            className="mt-2"
+                            checked={field.value}
+                            onCheckedChange={handleTeachingSkillsCheckboxChange(
+                              field.onChange
+                            )}
+                          />
+                        </FormControl>
+                        <FormLabel>Assessment Techniques</FormLabel>
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={formMethods.control}
+                    name="teachingSkills.otherTeachingSkills"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>If any other, please mention:</FormLabel>
+                        <FormControl>
+                          <Input
+                            placeholder="Other Teaching Skills"
+                            type="text"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
 
-                {/* Display error message if there is a validation error */}
-                {formMethods.formState.errors.teachingSkills?.root?.message && (
-                  <span className="text-destructive">
-                    {formMethods.formState.errors.teachingSkills.root?.message}
-                  </span>
-                )}
-              </motion.div>
+                  {/* Display error message if there is a validation error */}
+                  {formMethods.formState.errors.teachingSkills?.root
+                    ?.message && (
+                    <span className="text-destructive">
+                      {
+                        formMethods.formState.errors.teachingSkills.root
+                          ?.message
+                      }
+                    </span>
+                  )}
+                </motion.div>
+              </AnimatePresence>
 
               {/* Cultural Knowledge Section  */}
               <motion.div
@@ -603,12 +629,9 @@ function MultiStepFormWithTabs() {
                         <Checkbox
                           className="mt-2"
                           checked={field.value}
-                          onCheckedChange={(checked: boolean) => {
-                            handleCulturalKnowledgeCheckboxChange(
-                              field.onChange
-                            )(checked);
-                            setIsLanguageChecked(checked);
-                          }}
+                          onCheckedChange={handleCulturalKnowledgeCheckboxChange(
+                            field.onChange
+                          )}
                         />
                       </FormControl>
                       <FormLabel>
@@ -631,6 +654,19 @@ function MultiStepFormWithTabs() {
                               field.onChange
                             )(checked);
                             setIsLanguageChecked(checked);
+                            // Use setValue to update the languageDetails field when unchecked
+                            if (!checked) {
+                              formMethods.setValue(
+                                'culturalKnowledge.languageDetails',
+                                undefined
+                              );
+                              formMethods.clearErrors(
+                                'culturalKnowledge.fluencyInLanguages'
+                              ); // Clears the error when any checkbox changes
+                              formMethods.clearErrors(
+                                'culturalKnowledge.languageDetails'
+                              ); // Clears the error when any checkbox changes
+                            }
                           }}
                         />
                       </FormControl>
@@ -807,7 +843,6 @@ function MultiStepFormWithTabs() {
                 )}
               </motion.div>
             </TabsContent>
-
             <TabsContent value="step3">
               <motion.div
                 initial={{ opacity: 0 }}
@@ -863,7 +898,6 @@ function MultiStepFormWithTabs() {
                 />
               </motion.div>
             </TabsContent>
-
             <TabsContent value="step4">
               <motion.div
                 initial={{ opacity: 0 }}
@@ -943,7 +977,6 @@ function MultiStepFormWithTabs() {
                 ))}
               </motion.div>
             </TabsContent>
-
             {/* Certifications */}
             <TabsContent value="step5">
               <motion.div
