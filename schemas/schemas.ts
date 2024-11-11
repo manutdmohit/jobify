@@ -32,7 +32,7 @@ export const skillsSchema = z.object({
         data.classroomManagement ||
         data.curriculumDevelopment ||
         data.lessonPlanning ||
-        data.assessmentTechniques || // Check if any teaching skill is selected
+        data.assessmentTechniques ||
         data.otherTeachingSkills, // Check if any teaching skill is selected
       'Please select or fill in at least one teaching skill'
     ),
@@ -48,8 +48,6 @@ export const skillsSchema = z.object({
       (data) =>
         data.knowledgeOfSpecifiCulturesOrTraditions ||
         data.abilityToTeachCulturalValuesAndPerspectives ||
-        data.fluencyInLanguages ||
-        data.fluencyInLanguages ||
         data.languageDetails ||
         data.otherCulturalKnowledge, // Check if any cultural knowledge is selected or filled
 

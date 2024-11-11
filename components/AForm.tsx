@@ -161,7 +161,7 @@ function MultiStepFormWithTabs() {
   const culturalKnowledgeValidity =
     knowledgeOfSpecificCultures ||
     abilityToTeachCulturalValuesAndPerspectives ||
-    languageDetails ||
+    (fluencyInLanguages && languageDetails) ||
     otherCulturalKnowledge;
 
   const interpersonalSkillsValidity =
