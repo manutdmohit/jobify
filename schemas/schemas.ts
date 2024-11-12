@@ -5,6 +5,22 @@ export const personalInfoSchema = z.object({
   email: z.string().email(),
   phone: z.string().regex(/^\d+$/, 'Invalid Number!'),
   address: z.string().min(1, 'Address is required'),
+
+  ppPhoto: z
+    .string()
+    .nullable()
+    .refine(
+      (base64) => !base64 || base64.length <= 3 * 1024 * 1024, // Approx. size for 2MB in base64
+      'Max file size is 2MB'
+    ),
+
+  identityPhoto: z
+    .string()
+    .nullable()
+    .refine(
+      (base64) => !base64 || base64.length <= 3 * 1024 * 1024, // Approx. size for 2MB in base64
+      'Max file size is 2MB'
+    ),
 });
 
 export const educationSchema = z.object({
