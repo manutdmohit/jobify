@@ -48,9 +48,8 @@ import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
 import { AnimatePresence, motion } from 'framer-motion';
 import { X } from 'lucide-react';
-import { set } from 'zod';
 
-function MultiStepFormWithTabs({ currentTab }: any) {
+function MultiStepFormWithTabs() {
   const router = useRouter();
   const { toast } = useToast();
 
