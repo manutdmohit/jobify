@@ -1,8 +1,10 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useForm, FormProvider, SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import Image from 'next/image';
+
 import {
   personalInfoSchema,
   educationSchema,
@@ -45,9 +47,10 @@ import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
 import { AnimatePresence, motion } from 'framer-motion';
-import { log } from 'console';
+import { X } from 'lucide-react';
+import { set } from 'zod';
 
-function MultiStepFormWithTabs() {
+function MultiStepFormWithTabs({ currentTab }: any) {
   const router = useRouter();
   const { toast } = useToast();
 
@@ -113,6 +116,12 @@ function MultiStepFormWithTabs() {
     defaultValues: formData, // check here
   });
 
+  // // Sync file data with form state when going to next step or submitting
+  // useEffect(() => {
+  //   formMethods.setValue('ppPhoto', fileData.ppPhoto);
+  //   formMethods.setValue('identityPhoto', fileData.identityPhoto);
+  // }, [fileData, formMethods]);
+
   // Get Form Values
   const formValues = formMethods.getValues();
 
@@ -122,8 +131,6 @@ function MultiStepFormWithTabs() {
   const phone = formValues.phone;
   const address = formValues.address;
   const sop = formValues.statementOfPurpose;
-
-  console.log(sop.length);
 
   // Access nested field values
   const classroomManagement = formValues.teachingSkills?.classroomManagement;
@@ -198,6 +205,15 @@ function MultiStepFormWithTabs() {
     });
 
     formMethods.reset();
+
+    // Reset file data and file name in the state
+    setFileData({ ppPhoto: null, identityPhoto: null });
+    setFileName({ ppPhoto: null, identityPhoto: null });
+
+    // Reset the native file input value
+    if (ppPhotoInputRef.current) ppPhotoInputRef.current.value = '';
+    if (identityPhotoInputRef.current) identityPhotoInputRef.current.value = '';
+
     router.push('/');
     setCurrentStep(0);
   };
@@ -242,6 +258,64 @@ function MultiStepFormWithTabs() {
       fieldOnChange(value);
       formMethods.clearErrors('interPersonalSkills'); // Clears the error when any checkbox changes
     };
+
+  const [fileData, setFileData] = useState<{
+    ppPhoto: string | null;
+    identityPhoto: string | null;
+  }>({
+    ppPhoto: null,
+    identityPhoto: null,
+  });
+
+  const [fileName, setFileName] = useState<{
+    ppPhoto: string | null;
+    identityPhoto: string | null;
+  }>({
+    ppPhoto: null,
+    identityPhoto: null,
+  });
+
+  // Refs to handle file input reset
+  const ppPhotoInputRef = useRef<HTMLInputElement>(null);
+  const identityPhotoInputRef = useRef<HTMLInputElement>(null);
+
+  // Convert the selected file to base64
+  const convertToBase64 = (file: File | null): Promise<string | null> => {
+    return new Promise((resolve, reject) => {
+      if (!file) return resolve(null);
+
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => resolve(reader.result as string);
+      reader.onerror = (error) => reject(error);
+    });
+  };
+
+  // Function to handle clearing the file input
+  // const resetFileInput = () => {
+  //   if (ppPhotoInputRef.current) ppPhotoInputRef.current.value = '';
+  //   if (identityPhotoInputRef.current) identityPhotoInputRef.current.value = '';
+  // };
+
+  const handleRemovePPImage = () => {
+    setFormData((prev) => ({ ...prev, ppPhoto: null })); // Update form data
+    setFileData((prev) => ({ ...prev, ppPhoto: null })); // Update file data
+    setFileName((prev) => ({ ...prev, ppPhoto: null }));
+
+    formMethods.setValue('ppPhoto', '');
+
+    if (ppPhotoInputRef.current) ppPhotoInputRef.current.value = ''; // Reset the file input
+  };
+  const handleRemoveIdentityPhoto = () => {
+    setFormData((prev) => ({ ...prev, identityPhoto: '' })); // Update form data
+    setFileData((prev) => ({ ...prev, identityPhoto: '' })); // Update file data
+    setFileName((prev) => ({ ...prev, identityPhoto: '' }));
+
+    // Set the value to empty string
+    formMethods.setValue('identityPhoto', '');
+
+    if (identityPhotoInputRef.current) identityPhotoInputRef.current.value = ''; // Reset the file input
+  };
 
   return (
     <FormProvider {...formMethods}>
@@ -295,7 +369,6 @@ function MultiStepFormWithTabs() {
                   <h2 className="text-lg font-semibold">
                     Personal Information
                   </h2>
-
                   <FormField
                     control={formMethods.control}
                     name="fullName"
@@ -374,7 +447,257 @@ function MultiStepFormWithTabs() {
                       </FormItem>
                     )}
                   />
+                  {/* <FormField
+                    control={formMethods.control}
+                    name="ppPhoto"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Your Photo</FormLabel>
+                        <FormControl>
+                          <Input
+                            className="cursor-pointer"
+                            type="file"
+                            accept=".jpg,.jpeg,.png"
+                            onChange={(e) => {
+                              const file = e.target.files?.[0] || null;
+                              setFileData((prev) => ({
+                                ...prev,
+                                ppPhoto: file,
+                              }));
+                              field.onChange(file);
+                            }}
+                          />
+                        </FormControl>
+                        <FormDescription>
+                          Upload Your PP Size Photo
+                        </FormDescription>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  {formData.ppPhoto && (
+                    <div className="mt-4">
+                      <Image
+                        src={URL.createObjectURL(formData.ppPhoto)}
+                        alt="Preview"
+                        className="w-32 h-32 object-cover rounded-md"
+                        width={0}
+                        height={0}
+                      />
+                    </div>
+                  )}
 
+                  <FormField
+                    control={formMethods.control}
+                    name="identityPhoto"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>
+                          Your Identity Photo(E.g. Passport, Citizenship,
+                          Driving License)
+                        </FormLabel>
+                        <FormControl>
+                          <Input
+                            className="cursor-pointer"
+                            type="file"
+                            accept=".jpg,.jpeg,.png"
+                            onChange={(e) =>
+                              field.onChange(e.target.files?.[0])
+                            }
+                          />
+                        </FormControl>
+                        <FormDescription>
+                          Upload Your Identity Photo
+                        </FormDescription>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  {formData.identityPhoto && (
+                    <div className="mt-4">
+                      <p className="text-sm mb-2">
+                        {formData.identityPhoto.name}
+                      </p>
+                      <Image
+                        src={URL.createObjectURL(formData.identityPhoto)}
+                        alt="Preview"
+                        className="w-32 h-32 object-cover rounded-md"
+                        width={0}
+                        height={0}
+                      />
+                    </div>
+                  )} */}
+                  <div>
+                    <FormField
+                      control={formMethods.control}
+                      name="ppPhoto"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Your Photo</FormLabel>
+                          <FormControl>
+                            <div className="flex items-center space-x-2">
+                              {/* Hidden File Input */}
+                              <input
+                                ref={ppPhotoInputRef}
+                                type="file"
+                                accept=".jpg,.jpeg,.png"
+                                className="hidden"
+                                onChange={async (e) => {
+                                  const file = e.target.files?.[0] || null;
+                                  const base64 = await convertToBase64(file);
+
+                                  setFileData((prev) => ({
+                                    ...prev,
+                                    ppPhoto: base64,
+                                  }));
+                                  setFileName((prev) => ({
+                                    ...prev,
+                                    ppPhoto: file ? file.name : null,
+                                  }));
+
+                                  field.onChange(file?.name); // Pass file name to form state
+                                }}
+                              />
+
+                              {/* Custom Label to Display File Name */}
+                              <span className="text-sm">
+                                {fileName.ppPhoto || 'No file chosen'}
+                              </span>
+
+                              {/* Custom Button to Trigger File Input */}
+                              <button
+                                type="button"
+                                className="px-4 py-2 border rounded bg-blue-500 text-white"
+                                onClick={() => ppPhotoInputRef.current?.click()}
+                              >
+                                Choose File
+                              </button>
+                            </div>
+                          </FormControl>
+                          <FormDescription>
+                            Upload Your PP Size Photo
+                          </FormDescription>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    {/* Display image preview */}
+                    {fileData.ppPhoto && (
+                      <div className="relative mt-4 inline-block">
+                        <Image
+                          src={fileData.ppPhoto}
+                          alt="Preview"
+                          className="w-32 h-32 object-cover rounded-md"
+                          width={128}
+                          height={128}
+                        />
+
+                        {/* X Icon for Removing Image */}
+                        <button
+                          onClick={handleRemovePPImage}
+                          className="absolute top-1 right-1 bg-red-600 text-white rounded-full p-1"
+                          aria-label="Remove Image"
+                        >
+                          <X className="w-4 h-4" />
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                  {formMethods.getValues('ppPhoto') === '' && (
+                    <span className="text-destructive">
+                      Please upload a profile photo
+                    </span>
+                  )}
+                  <div>
+                    {/* Identity Photo */}
+                    <FormField
+                      control={formMethods.control}
+                      name="identityPhoto"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>
+                            Your Identity Photo (E.g. Passport, Citizenship,
+                            Driving License)
+                          </FormLabel>
+                          <FormControl>
+                            <div className="flex items-center space-x-2">
+                              {/* Hidden File Input */}
+                              <input
+                                ref={identityPhotoInputRef}
+                                type="file"
+                                accept=".jpg,.jpeg,.png"
+                                className="hidden"
+                                onChange={async (e) => {
+                                  const file = e.target.files?.[0] || null;
+                                  const base64 = await convertToBase64(file);
+
+                                  setFileData((prev) => ({
+                                    ...prev,
+                                    identityPhoto: base64,
+                                  }));
+                                  setFileName((prev) => ({
+                                    ...prev,
+                                    identityPhoto: file ? file.name : null,
+                                  }));
+
+                                  field.onChange(file?.name); // Pass file name to form state
+                                }}
+                              />
+
+                              {/* Custom Label to Display File Name */}
+                              <span className="text-sm">
+                                {fileName.identityPhoto || 'No file chosen'}
+                              </span>
+
+                              {/* Custom Button to Trigger File Input */}
+                              <button
+                                type="button"
+                                className="px-4 py-2 border rounded bg-blue-500 text-white"
+                                onClick={() =>
+                                  identityPhotoInputRef.current?.click()
+                                }
+                              >
+                                Choose File
+                              </button>
+                            </div>
+                          </FormControl>
+                          <FormDescription>
+                            Upload Your Identity Photo
+                          </FormDescription>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    {/* Display image preview */}
+                    {fileData.identityPhoto && (
+                      <div className="relative mt-4 inline-block">
+                        <Image
+                          src={fileData.identityPhoto}
+                          alt="Preview"
+                          className="w-32 h-32 object-cover rounded-md"
+                          width={128}
+                          height={128}
+                        />
+
+                        {/* X Icon for Removing Image */}
+                        <button
+                          onClick={handleRemoveIdentityPhoto}
+                          className="absolute top-1 right-1 bg-red-600 text-white rounded-full p-1"
+                          aria-label="Remove Image"
+                        >
+                          <X className="w-4 h-4" />
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                  {formMethods.getValues('identityPhoto') === '' && (
+                    <span className="text-destructive">
+                      Please upload your identity photo
+                    </span>
+                  )}
                   <h2>Please fill all the necessary fields</h2>
                 </motion.div>
               </AnimatePresence>
