@@ -62,6 +62,7 @@ function MultiStepFormWithTabs() {
     phone: '',
     address: '',
     degree: '',
+    jobPreference: '',
     institution: '',
     yearOfGraduation: '',
     teachingSkills: {
@@ -131,6 +132,7 @@ function MultiStepFormWithTabs() {
   const email = formValues.email;
   const phone = formValues.phone;
   const address = formValues.address;
+  const jobPreference = formValues.jobPreference;
   const sop = formValues.statementOfPurpose;
 
   // Access nested field values
@@ -160,7 +162,8 @@ function MultiStepFormWithTabs() {
     formValues.interPersonalSkills?.otherInterpersonalSkills;
 
   // Check validity of personal info
-  const personalInfoValidity = fullName && email && phone && address;
+  const personalInfoValidity =
+    fullName && email && phone && address && jobPreference;
 
   // Check validity of Teaching Skills
   const teachingSkillsValidity =
@@ -495,6 +498,40 @@ function MultiStepFormWithTabs() {
                           </FormControl>
                           <FormDescription>
                             Provide your address
+                          </FormDescription>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={formMethods.control}
+                      name="jobPreference"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Job Preference</FormLabel>
+                          <Select
+                            onValueChange={field.onChange}
+                            defaultValue={field.value}
+                          >
+                            <FormControl>
+                              <SelectTrigger className="text-xs md:w-2/3">
+                                <SelectValue
+                                  placeholder="Select a a job preference"
+                                  className="md:w-2/3"
+                                />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              <SelectItem value="schools">Schools</SelectItem>
+                              <SelectItem value="events">Events</SelectItem>
+                              <SelectItem value="homeTutor">
+                                Home Tutor
+                              </SelectItem>
+                            </SelectContent>
+                          </Select>
+                          <FormDescription>
+                            Please provide your job preference
                           </FormDescription>
                           <FormMessage />
                         </FormItem>

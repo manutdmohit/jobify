@@ -5,7 +5,7 @@ export const personalInfoSchema = z.object({
   email: z.string().email(),
   phone: z.string().regex(/^\d+$/, 'Invalid Number!'),
   address: z.string().min(1, 'Address is required'),
-
+  jobPreference: z.string().min(1, 'Job Preference is required'),
   ppPhoto: z
     .string()
     .nullable()
