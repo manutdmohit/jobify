@@ -333,7 +333,7 @@ function MultiStepFormWithTabs() {
         }}
         className="flex flex-col gap-4 min-h-screen items-center justify-center max-w-full mx-auto p-6 bg-gray-100"
       >
-        <Card className="w-full max-w-7xl my-5 h-[1056px] md:min-h-screen">
+        <Card className="w-full max-w-7xl my-5 min-h-[1056px] md:min-h-screen">
           <motion.div
             initial={{ opacity: 0, y: 50 }}
             animate={{ opacity: 1, y: 0 }}
@@ -543,7 +543,8 @@ function MultiStepFormWithTabs() {
                                 {/* Custom Button to Trigger File Input */}
                                 <Button
                                   type="button"
-                                  className="px-4 py-2 border rounded text-white"
+                                  className="border rounded text-white"
+                                  size="sm"
                                   onClick={() =>
                                     ppPhotoInputRef.current?.click()
                                   }
@@ -631,7 +632,8 @@ function MultiStepFormWithTabs() {
                                 {/* Custom Button to Trigger File Input */}
                                 <Button
                                   type="button"
-                                  className="px-4 py-2 border rounded text-white"
+                                  className="border rounded text-white"
+                                  size="sm"
                                   onClick={() =>
                                     identityPhotoInputRef.current?.click()
                                   }
