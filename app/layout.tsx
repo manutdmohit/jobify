@@ -5,6 +5,7 @@ import './globals.css';
 
 import { LightDarkToggle } from '../components/ui/light-dark-toggle';
 import { Toaster } from '@/components/ui/toaster';
+import Navbar from '@/components/Navbar';
 
 const poppins = Poppins({
   subsets: ['latin'],
@@ -24,6 +25,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={cn(poppins.className, 'bg-background')}>
+        <Navbar />
         {children}
 
         <LightDarkToggle className="fixed top-[calc(50%-12px)] right-2" />
