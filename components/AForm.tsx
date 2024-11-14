@@ -1035,7 +1035,7 @@ function MultiStepFormWithTabs() {
                         <FormLabel>Specify Languages:</FormLabel>
                         <FormControl>
                           <Input
-                            placeholder="E.g., Spanish, Mandarin, French"
+                            placeholder="E.g. English, Spanish, French"
                             type="text"
                             {...field}
                           />
