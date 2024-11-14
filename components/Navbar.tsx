@@ -94,7 +94,7 @@ const Navbar = () => {
           </div>
 
           {/* <!-- Right Side Menu (Logged Out) --> */}
-          {!isLoggedIn && (
+          {/* {!isLoggedIn && (
             <div className="hidden md:block md:ml-6">
               <div className="flex items-center">
                 <button className="flex items-center text-white bg-gray-700 hover:bg-gray-900 hover:text-white rounded-md px-3 py-2">
@@ -103,7 +103,7 @@ const Navbar = () => {
                 </button>
               </div>
             </div>
-          )}
+          )} */}
 
           {/* <!-- Right Side Menu (Logged In) --> */}
           {isLoggedIn && (
@@ -232,13 +232,13 @@ const Navbar = () => {
                 Add Property
               </Link>
             )}
-
+            {/* 
             {!isLoggedIn && (
               <button className="flex items-center text-white bg-gray-700 hover:bg-gray-900 hover:text-white rounded-md px-3 py-2 my-5">
                 <i className="fa-brands fa-google mr-2"></i>
                 <span>Login or Register</span>
               </button>
-            )}
+            )} */}
           </div>
         </div>
       )}
