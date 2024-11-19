@@ -42,6 +42,7 @@ export interface User extends Document {
   email: string;
   phone: string;
   address: string;
+  role: string;
   is_verified: boolean;
   jobPreference: string;
   degree: string;
@@ -80,6 +81,14 @@ const UserSchema: Schema<User> = new Schema(
     address: {
       type: String,
       required: [true, 'Address is required'],
+    },
+    role: {
+      type: String,
+      // required: true,
+      enum: {
+        values: ['admin', 'coordinator', 'school', 'tutor', 'student'],
+        message: '{VALUE} is not supported',
+      },
     },
     is_verified: {
       type: Boolean,
