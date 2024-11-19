@@ -46,14 +46,25 @@ import {
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 
-import { useToast } from '@/hooks/use-toast';
+import { useToast } from '@/components/ui/use-toast';
 import { useRouter } from 'next/navigation';
 import { AnimatePresence, motion } from 'framer-motion';
-import { User, Book, Award, FileText, Users, FileCheck, X } from 'lucide-react';
+import {
+  User,
+  Book,
+  Award,
+  FileText,
+  Users,
+  FileCheck,
+  X,
+  Loader2,
+} from 'lucide-react';
 
 function MultiStepFormWithTabs() {
   const router = useRouter();
   const { toast } = useToast();
+
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const [currentStep, setCurrentStep] = useState(0);
   const [formData, setFormData] = useState<Partial<CombinedFormData>>({
@@ -197,29 +208,41 @@ function MultiStepFormWithTabs() {
   const validity = personalInfoValidity && sop.length >= 50 && isSkillsValid;
 
   const onSubmit: SubmitHandler<CombinedFormData> = async (data) => {
+    setIsSubmitting(true);
     console.log('data', data);
 
-    const finalData = { ...formData, ...data };
-    console.log('Final Submission Data: ', finalData);
+    try {
+      const finalData = { ...formData, ...data };
+      console.log('Final Submission Data: ', finalData);
 
-    toast({
-      title: 'Success',
-      description: 'Your action was successful.',
-      variant: 'success',
-    });
+      toast({
+        title: 'Success',
+        description: 'Your action was successful.',
+        variant: 'success',
+      });
 
-    formMethods.reset();
+      formMethods.reset();
 
-    // Reset file data and file name in the state
-    setFileData({ ppPhoto: null, identityPhoto: null });
-    setFileName({ ppPhoto: null, identityPhoto: null });
+      // Reset file data and file name in the state
+      setFileData({ ppPhoto: null, identityPhoto: null });
+      setFileName({ ppPhoto: null, identityPhoto: null });
 
-    // Reset the native file input value
-    if (ppPhotoInputRef.current) ppPhotoInputRef.current.value = '';
-    if (identityPhotoInputRef.current) identityPhotoInputRef.current.value = '';
+      // Reset the native file input value
+      if (ppPhotoInputRef.current) ppPhotoInputRef.current.value = '';
+      if (identityPhotoInputRef.current)
+        identityPhotoInputRef.current.value = '';
 
-    router.push('/');
-    setCurrentStep(0);
+      setCurrentStep(0);
+      router.push('/');
+    } catch (error) {
+      toast({
+        title: 'Error',
+        description: 'Something went wrong. Please try again.',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleNext = async () => {
@@ -716,7 +739,9 @@ function MultiStepFormWithTabs() {
                     )}
                   </div>
 
-                  <h2>Please fill all the necessary fields</h2>
+                  <span className="text-sm text-destructive font-bold">
+                    Please fill all the necessary fields*
+                  </span>
                 </motion.div>
               </AnimatePresence>
             </TabsContent>
@@ -1371,6 +1396,12 @@ function MultiStepFormWithTabs() {
                     </div>
                   ))}
                 </div>
+
+                {!validity && (
+                  <span className="text-destructive">
+                    Please fill in all the required fields for every step
+                  </span>
+                )}
               </motion.div>
             </TabsContent>
           </CardContent>
@@ -1382,9 +1413,13 @@ function MultiStepFormWithTabs() {
             ) : (
               <Button
                 onClick={formMethods.handleSubmit(onSubmit)}
-                disabled={!validity}
+                disabled={!validity || isSubmitting}
               >
-                Submit
+                {isSubmitting ? (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                ) : (
+                  'Submit'
+                )}
               </Button>
             )}
           </CardFooter>

@@ -13,7 +13,6 @@ export const personalInfoSchema = z.object({
       (base64) => !base64 || base64.length <= 3 * 1024 * 1024, // Approx. size for 2MB in base64
       'Max file size is 2MB'
     ),
-
   identityPhoto: z
     .string()
     .nullable()
