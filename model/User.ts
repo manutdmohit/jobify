@@ -40,10 +40,11 @@ export interface certifications {
 export interface User extends Document {
   fullName: string;
   email: string;
+  password: string;
   phone: string;
   address: string;
   role: string;
-  is_verified: boolean;
+  isVerified: boolean;
   jobPreference: string;
   degree: string;
   ppPhoto: string;
@@ -74,6 +75,9 @@ const UserSchema: Schema<User> = new Schema(
         'Please use a valid email address',
       ],
     },
+    password: {
+      type: String,
+    },
     phone: {
       type: String,
       required: [true, 'Phone Number is required'],
@@ -90,7 +94,7 @@ const UserSchema: Schema<User> = new Schema(
         message: '{VALUE} is not supported',
       },
     },
-    is_verified: {
+    isVerified: {
       type: Boolean,
       default: false,
     },
