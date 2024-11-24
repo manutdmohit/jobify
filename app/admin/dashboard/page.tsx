@@ -9,21 +9,17 @@ import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 import LoadingPage from './loading';
 
+import { checkSession } from '@/utils/CheckSession';
+
 export default function DashboardPage() {
-  const { data: session, status } = useSession();
+  const session = checkSession();
   const router = useRouter();
 
-  // Redirect to sign-in if not authenticated
   useEffect(() => {
-    if (status === 'unauthenticated') {
-      router.replace('/sign-in');
+    if (!session) {
+      return router.push('/sign-in');
     }
-  }, [status, router]);
-
-  // Display a loading state while the session is being fetched
-  if (status === 'loading') {
-    return <LoadingPage />;
-  }
+  }, [session]);
 
   return (
     <Tabs defaultValue="employees">

@@ -1,6 +1,7 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { DataTable } from '@/components/ui/data-table';
 import { columns, School } from './columns';
@@ -15,13 +16,23 @@ export default function SchoolsPage() {
     { name: 'Riverside Learning Center' },
   ]);
 
-  const addSchool = () => {
-    const newSchoolName = prompt('Enter the new school name:');
-    if (newSchoolName) {
-      const isFeatured = confirm('Is this a featured school?');
-      setSchools((prev) => [...prev, { name: newSchoolName, isFeatured }]);
-    }
-  };
+  useEffect(() => {
+    const fetchSchools = async () => {
+      try {
+        const response = await fetch('/api/schools');
+        const data = await response.json();
+        console.log('Schools:', data);
+
+        setSchools(data);
+      } catch (error) {
+        console.error('Error fetching schools:', error);
+      }
+    };
+
+    fetchSchools();
+  }, []);
+
+  const router = useRouter();
 
   return (
     <div className="p-6">
@@ -30,7 +41,10 @@ export default function SchoolsPage() {
           <CardTitle>Schools</CardTitle>
         </CardHeader>
         <CardContent>
-          <Button onClick={addSchool} className="mb-4">
+          <Button
+            onClick={() => router.push('/admin/dashboard/schools/add')}
+            className="mb-4"
+          >
             Add School
           </Button>
           <DataTable columns={columns} data={schools} />

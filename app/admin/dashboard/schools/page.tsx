@@ -1,12 +1,14 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { DataTable } from '@/components/ui/data-table';
 import { columns, School } from './columns';
 import { Button } from '@/components/ui/button';
 import axios, { AxiosError } from 'axios';
 import { toast } from '@/components/ui/use-toast';
+import { useSession } from 'next-auth/react';
 
 export default function SchoolsPage() {
   // const [schools, setSchools] = useState<School[]>([
@@ -17,9 +19,17 @@ export default function SchoolsPage() {
   //   { name: 'Riverside Learning Center' },
   // ]);
 
+  const { data: session } = useSession();
+
+  const router = useRouter();
+
   const [schools, setSchools] = useState<School[]>([]);
 
   useEffect(() => {
+    // if (!session) {
+    //   router.push('/sign-in');
+    // }
+
     const fetchSchools = async () => {
       try {
         const response = await axios.get('/api/schools');
@@ -61,14 +71,6 @@ export default function SchoolsPage() {
     fetchSchools();
   }, []);
 
-  // const addSchool = () => {
-  //   const newSchoolName = prompt('Enter the new school name:');
-  //   if (newSchoolName) {
-  //     const isFeatured = confirm('Is this a featured school?');
-  //     setSchools((prev) => [...prev, { name: newSchoolName, isFeatured }]);
-  //   }
-  // };
-
   return (
     <div className="p-6">
       <Card className="mb-6">
@@ -76,7 +78,12 @@ export default function SchoolsPage() {
           <CardTitle>Schools</CardTitle>
         </CardHeader>
         <CardContent>
-          <Button className="mb-4">Add School</Button>
+          <Button
+            className="mb-4"
+            onClick={() => router.push('/admin/dashboard/schools/add')}
+          >
+            Add School
+          </Button>
           <DataTable columns={columns} data={schools} />
         </CardContent>
       </Card>

@@ -214,7 +214,7 @@ const Navbar = () => {
                       tabIndex={-1}
                       id="user-menu-item-2"
                       onClick={() => {
-                        signOut({ callbackUrl: '/' });
+                        signOut({ callbackUrl: '/sign-in' });
                       }}
                     >
                       Sign Out

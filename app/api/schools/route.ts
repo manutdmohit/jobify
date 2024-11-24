@@ -1,43 +1,60 @@
+import { getServerSession, User } from 'next-auth';
 import dbConnect from '@/lib/dbConnect';
 import School from '@/model/School';
+import { authOptions } from '../auth/[...nextauth]/options';
 
 export const dynamic = 'force-dynamic';
 
-// @desc Register School
-// @route POST /api/schools
+function createJsonResponse(body: object, status: number): Response {
+  return new Response(JSON.stringify(body), {
+    status,
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
+}
+
 export const POST = async (request: Request) => {
   await dbConnect();
 
+  const session = await getServerSession(authOptions);
+
+  console.log({ currentUser: session?.user });
+
+  const user: User = session?.user as User;
+
+  if (!session || !user || user.role !== 'admin') {
+    return createJsonResponse(
+      { success: false, message: 'Not Authenticated' },
+      401
+    );
+  }
+
   try {
     const data = await request.json();
-
     const school = new School(data);
     await school.save();
-    return new Response(JSON.stringify(school), { status: 201 });
+    return createJsonResponse({ success: true, school }, 201);
   } catch (error) {
-    return new Response(
-      JSON.stringify({ success: false, message: 'Internal server error' }),
-      {
-        status: 500,
-      }
+    console.error('Error saving school:', error);
+    return createJsonResponse(
+      { success: false, message: 'Internal server error' },
+      500
     );
   }
 };
 
-// @desc Get All Schools
-// @route GET /api/schools
 export const GET = async (request: Request) => {
   try {
     await dbConnect();
 
     const schools = await School.find().sort({ createdAt: -1 });
-
-    return new Response(JSON.stringify(schools), {
-      status: 200,
-    });
+    return createJsonResponse(schools, 200);
   } catch (error) {
-    console.error(error);
-
-    return new Response('Something went wrong', { status: 500 });
+    console.error('Error fetching schools:', error);
+    return createJsonResponse(
+      { success: false, message: 'Something went wrong' },
+      500
+    );
   }
 };
