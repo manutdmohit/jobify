@@ -8,7 +8,7 @@ export async function middleware(request: NextRequest) {
   const url = request.nextUrl;
 
   // Define public paths
-  const publicPaths = ['/sign-in', '/sign-up', '/verify', '/'];
+  const publicPaths = ['/sign-in', '/sign-up', '/verify'];
 
   // Redirect to sign-in if not authenticated and trying to access protected routes
   if (!token && !publicPaths.some((path) => url.pathname.startsWith(path))) {
@@ -19,7 +19,19 @@ export async function middleware(request: NextRequest) {
 
   // Redirect authenticated users away from public paths to '/dashboard'
   if (token && publicPaths.some((path) => url.pathname.startsWith(path))) {
-    return NextResponse.redirect(new URL('/dashboard', request.url));
+    console.log(request.url);
+
+    if (token.role === 'admin' && request.url !== '/') {
+      return NextResponse.redirect(new URL('/admin/dashboard', request.url));
+    } else if (token.role === 'tutor' && request.url !== '/') {
+      return NextResponse.redirect(new URL('/tutors/dashboard', request.url));
+    } else if (token.role === 'school' && request.url !== '/') {
+      return NextResponse.redirect(new URL('/schools/dashboard', request.url));
+    } else if (token.role === 'student' && request.url === '/') {
+      return NextResponse.redirect(new URL('/students/dashboard', request.url));
+    } else {
+      return NextResponse.redirect(new URL('/', request.url));
+    }
   }
 
   // Allow access if no redirection condition is met

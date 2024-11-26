@@ -5,7 +5,7 @@ import { authOptions } from '../auth/[...nextauth]/options';
 
 export const dynamic = 'force-dynamic';
 
-function createJsonResponse(body: object, status: number): Response {
+export function createJsonResponse(body: object, status: number): Response {
   return new Response(JSON.stringify(body), {
     status,
     headers: {
@@ -19,8 +19,6 @@ export const POST = async (request: Request) => {
 
   const session = await getServerSession(authOptions);
 
-  console.log({ currentUser: session?.user });
-
   const user: User = session?.user as User;
 
   if (!session || !user || user.role !== 'admin') {
@@ -32,7 +30,22 @@ export const POST = async (request: Request) => {
 
   try {
     const data = await request.json();
-    const school = new School(data);
+    console.log(data);
+
+    const getSchoolByEmail = await School.findOne({
+      contactEmail: data.contactEmail,
+    });
+
+    if (getSchoolByEmail) {
+      return createJsonResponse(
+        {
+          success: false,
+          message: 'School with the same email already exists',
+        },
+        400
+      );
+    }
+    const school = new School({ ...data, createdBy: user._id });
     await school.save();
     return createJsonResponse({ success: true, school }, 201);
   } catch (error) {

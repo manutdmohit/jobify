@@ -5,15 +5,12 @@ import { useForm } from 'react-hook-form';
 import * as z from 'zod';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
-import { useDebounceCallback } from 'usehooks-ts';
 import { useToast } from '@/components/ui/use-toast';
 import { useRouter } from 'next/navigation';
-import axios, { AxiosError } from 'axios';
-
-// import { signInSchema } from '@/Schemas/signInSchema';
+import { signIn, useSession } from 'next-auth/react';
+import { checkSession } from '@/utils/CheckSession';
 
 import { signInSchema } from '@/schemas/signInSchema';
-import { ApiResponse } from '@/types/ApiResponse';
 import {
   Form,
   FormControl,
@@ -24,8 +21,6 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Loader2 } from 'lucide-react';
-import { signIn } from 'next-auth/react';
 
 const SigninPage = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -33,7 +28,30 @@ const SigninPage = () => {
   const { toast } = useToast();
   const router = useRouter();
 
-  // zod implemenation
+  const session = checkSession();
+
+  useEffect(() => {
+    if (session?.user?.role) {
+      const role = session.user.role;
+
+      const destinations: Record<string, string> = {
+        admin: '/admin/dashboard',
+        school: '/schools/dashboard',
+        tutor: '/tutors/dashboard',
+      };
+
+      const destination = destinations[role] || '/sign-in';
+
+      // Use window.location.pathname for safer client-side checks
+      if (
+        typeof window !== 'undefined' &&
+        window.location.pathname !== destination
+      ) {
+        router.replace(destination);
+      }
+    }
+  }, [session, router]);
+
   const form = useForm<z.infer<typeof signInSchema>>({
     resolver: zodResolver(signInSchema),
     defaultValues: {
@@ -43,7 +61,7 @@ const SigninPage = () => {
   });
 
   const onSubmit = async (data: z.infer<typeof signInSchema>) => {
-    // setIsSubmitting(true);
+    setIsSubmitting(true);
 
     const result = await signIn('credentials', {
       redirect: false,
@@ -51,25 +69,17 @@ const SigninPage = () => {
       password: data.password,
     });
 
-    console.log({ result });
+    setIsSubmitting(false);
 
     if (result?.error) {
-      if (result.error == 'CredentialsSignin') {
-        toast({
-          title: 'Login Failed',
-          description: 'Incorrect username or password',
-          variant: 'destructive',
-        });
-      } else
-        toast({
-          title: 'Error',
-          description: 'result.error',
-          variant: 'destructive',
-        });
-    }
-
-    if (result?.url) {
-      router.replace('/admin/dashboard');
+      toast({
+        title: 'Error',
+        description:
+          result.error === 'CredentialsSignin'
+            ? 'Incorrect username or password'
+            : result.error,
+        variant: 'destructive',
+      });
     }
   };
 
@@ -94,15 +104,14 @@ const SigninPage = () => {
                   <FormControl>
                     <Input
                       placeholder="email/username"
-                      className="focus-visible:ring-transparent"
                       {...field}
+                      className="focus-visible:ring-transparent"
                     />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
-
             <FormField
               name="password"
               control={form.control}
@@ -111,8 +120,8 @@ const SigninPage = () => {
                   <FormLabel>Password</FormLabel>
                   <FormControl>
                     <Input
-                      placeholder="password"
                       type="password"
+                      placeholder="password"
                       {...field}
                       className="focus-visible:ring-transparent"
                     />
@@ -121,12 +130,14 @@ const SigninPage = () => {
                 </FormItem>
               )}
             />
-            <Button type="submit">Signin</Button>
+            <Button type="submit" disabled={isSubmitting}>
+              {isSubmitting ? 'Signing in...' : 'Sign in'}
+            </Button>
           </form>
         </Form>
         <div className="text-center mt-4">
           <p>Want to be a member?</p>
-          <Link href="/sign-uo" className="text-blue-600 hover:text-blue-800">
+          <Link href="/sign-up" className="text-blue-600 hover:text-blue-800">
             Sign Up
           </Link>
         </div>

@@ -25,7 +25,7 @@ import {
 } from '@/components/ui/card';
 import axios, { AxiosError } from 'axios';
 import { toast } from '@/components/ui/use-toast';
-import { useRouter } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 
 // Extended schema for the form
@@ -52,6 +52,9 @@ const schoolSchema = z.object({
 type SchoolFormValues = z.infer<typeof schoolSchema>;
 
 const SchoolForm: React.FC = () => {
+  const params = useParams();
+  const schoolId = params.id;
+
   const [loading, setLoading] = useState(false);
 
   const { data: session } = useSession();
@@ -72,39 +75,73 @@ const SchoolForm: React.FC = () => {
     },
   });
 
+  // Fetch school data for editing
+  useEffect(() => {
+    const fetchSchoolData = async () => {
+      try {
+        const response = await axios.get(`/api/schools/${schoolId}`);
+        const schoolData = response.data;
+
+        form.reset({
+          name: schoolData.name,
+          address: schoolData.address,
+          establishedYear: schoolData.establishedYear,
+          contactEmail: schoolData.contactEmail,
+          contactPhone: schoolData.contactPhone,
+          website: schoolData.website,
+          principalName: schoolData.principalName,
+          schoolType: schoolData.schoolType,
+          isVerified: schoolData.isVerified,
+        });
+      } catch (error) {
+        console.error('Error fetching school data:', error);
+        toast({
+          title: 'Error',
+          description: 'Failed to fetch school data.',
+          variant: 'destructive',
+        });
+      }
+    };
+
+    fetchSchoolData();
+  }, [form]);
+
   const onSubmit = async (data: SchoolFormValues) => {
     try {
       setLoading(true);
 
-      // Send data to API with axios
-      const response = await axios.post('/api/schools', JSON.stringify(data));
+      // Update school data via API
+      if (schoolId) {
+        const response = await axios.put(`/api/schools/${schoolId}`, data);
 
-      console.log('API Response:', response.data);
+        console.log('API Response:', response.data);
 
-      form.reset();
-      toast({
-        title: 'Success',
-        description: 'Form submitted successfully!',
-        variant: 'success',
-      });
+        form.reset();
 
-      router.push('/admin/dashboard/schools');
+        toast({
+          title: 'Success',
+          description: 'School data updated successfully!',
+          variant: 'success',
+        });
+
+        router.push('/admin/dashboard/schools');
+      } else {
+        throw new Error('School ID is missing.');
+      }
     } catch (error: unknown) {
       if (axios.isAxiosError(error)) {
-        // Axios-specific error handling
         console.error('Axios error:', error.response?.data || error.message);
         toast({
           title: 'Error',
           description:
-            error.response?.data?.message || 'Failed to create school.',
+            error.response?.data?.message || 'Failed to update school data.',
           variant: 'destructive',
         });
       } else {
-        // Generic error handling
         console.error('Unexpected error:', error);
         toast({
           title: 'Error',
-          description: 'Something went wrong while creating the school.',
+          description: 'Something went wrong while updating the school data.',
           variant: 'destructive',
         });
       }
@@ -118,7 +155,7 @@ const SchoolForm: React.FC = () => {
       <Card className="w-full max-w-6xl mx-auto flex flex-col justify-center items-center p-6 sm:p-8 lg:p-12">
         <CardHeader>
           <CardTitle className="text-2xl font-bold text-center">
-            Add School
+            Edit School
           </CardTitle>
         </CardHeader>
         <CardContent className="w-full">
@@ -127,6 +164,8 @@ const SchoolForm: React.FC = () => {
               onSubmit={form.handleSubmit(onSubmit)}
               className="grid grid-cols-1 sm:grid-cols-2 gap-6 md:gap-8 lg:gap-10"
             >
+              {/* All fields remain the same */}
+
               {/* School Name */}
               <FormField
                 control={form.control}
@@ -288,7 +327,7 @@ const SchoolForm: React.FC = () => {
                   className="w-full max-w-xs"
                   disabled={loading}
                 >
-                  Submit
+                  {loading ? 'Updating...' : 'Update'}
                 </Button>
               </div>
             </form>

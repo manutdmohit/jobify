@@ -4,11 +4,12 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { DataTable } from '@/components/ui/data-table';
-import { columns, School } from './columns';
+import { columns } from './columns';
 import { Button } from '@/components/ui/button';
 import axios, { AxiosError } from 'axios';
 import { toast } from '@/components/ui/use-toast';
 import { useSession } from 'next-auth/react';
+import { School } from '@/model/School';
 
 export default function SchoolsPage() {
   // const [schools, setSchools] = useState<School[]>([
@@ -26,9 +27,9 @@ export default function SchoolsPage() {
   const [schools, setSchools] = useState<School[]>([]);
 
   useEffect(() => {
-    // if (!session) {
-    //   router.push('/sign-in');
-    // }
+    if (!session) {
+      router.push('/sign-in');
+    }
 
     const fetchSchools = async () => {
       try {
@@ -69,7 +70,7 @@ export default function SchoolsPage() {
     };
 
     fetchSchools();
-  }, []);
+  }, [session]);
 
   return (
     <div className="p-6">
