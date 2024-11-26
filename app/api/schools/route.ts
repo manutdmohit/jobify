@@ -5,7 +5,7 @@ import { authOptions } from '../auth/[...nextauth]/options';
 
 export const dynamic = 'force-dynamic';
 
-export function createJsonResponse(body: object, status: number): Response {
+function createJsonResponse(body: object, status: number): Response {
   return new Response(JSON.stringify(body), {
     status,
     headers: {

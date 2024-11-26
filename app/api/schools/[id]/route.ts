@@ -1,6 +1,14 @@
 import dbConnect from '@/lib/dbConnect';
 import School from '@/model/School';
-import { createJsonResponse } from '../route';
+
+function createJsonResponse(body: object, status: number): Response {
+  return new Response(JSON.stringify(body), {
+    status,
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
+}
 
 export const GET = async (
   request: Request,
