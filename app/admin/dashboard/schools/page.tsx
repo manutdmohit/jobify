@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button';
 import axios, { AxiosError } from 'axios';
 import { toast } from '@/components/ui/use-toast';
 import { useSession } from 'next-auth/react';
-import { School } from '@/model/School';
+import { SchoolType } from '@/model/School';
 
 export default function SchoolsPage() {
   // const [schools, setSchools] = useState<School[]>([
@@ -24,7 +24,7 @@ export default function SchoolsPage() {
 
   const router = useRouter();
 
-  const [schools, setSchools] = useState<School[]>([]);
+  const [schools, setSchools] = useState<SchoolType[]>([]);
 
   useEffect(() => {
     if (!session) {
