@@ -7,7 +7,7 @@ import { ColumnDef } from '@tanstack/react-table';
 import { BadgeCheck, BadgeX, EyeIcon } from 'lucide-react';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
-import { schoolsSchema, School } from '@/model/School';
+import { schoolsSchema, SchoolType } from '@/model/School';
 import { use } from 'react';
 import { useRouter } from 'next/navigation';
 
@@ -22,7 +22,7 @@ export type Employee = {
   avatar?: string;
 };
 
-export const columns: ColumnDef<School>[] = [
+export const columns: ColumnDef<SchoolType>[] = [
   {
     accessorKey: 'name',
     header: 'School Name',
@@ -79,7 +79,7 @@ export const columns: ColumnDef<School>[] = [
     header: 'Actions',
     cell: ({ row }) => {
       const router = useRouter(); // Access the router instance
-      const getRow = row.original as School;
+      const getRow = row.original as SchoolType;
       const schoolId = getRow._id;
 
       return (
