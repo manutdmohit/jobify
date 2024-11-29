@@ -1,50 +1,56 @@
 import mongoose, { Schema, Document } from 'mongoose';
 import { z } from 'zod';
 
-// Schema for a single School
+// Zod schema for a single School
 export const schoolSchema = z.object({
   _id: z.string(),
-  name: z.string().min(1, 'School name is required').max(100, 'Name too long'), // School name
-  address: z.string().optional(), // Optional school address
+  name: z.string().min(1, 'School name is required').max(100, 'Name too long'),
+  password: z.string().min(6, 'Please provide password'),
+  address: z.string().optional(),
   establishedYear: z
     .number()
     .int()
     .min(1800, 'Year must be after 1800')
     .max(new Date().getFullYear(), 'Year cannot be in the future')
-    .optional(), // Year the school was established
-  contactEmail: z.string().email('Invalid email format').optional(), // Optional contact email for the school
-  contactPhone: z.string().optional(), // Optional contact phone number
-  principalName: z.string().optional(), // Optional name of the principal
-  schoolType: z.enum(['Public', 'Private', 'Charter', 'Other']).optional(), // Type of school
-  studentCapacity: z.number().min(1).optional(), // Total capacity of students the school can accommodate
-  logo: z.string().optional(), // URL or path to the school's logo image
-  website: z.string().url().optional(), // School's website URL
-  createdBy: z.string().optional(), // Optional creator of the school
-  country: z.string().min(1).max(50).optional(), // Country where the school is located
-  state: z.string().min(1).max(50).optional(), // State/Province where the school is located
-  city: z.string().min(1).max(50).optional(), // City where the school is located
-  postalCode: z.string().min(1).max(20).optional(), // Postal code of the school's location
-  accreditationStatus: z.boolean().optional(), // Whether the school is accredited or not
-  parentSchool: z.string().optional(), // Optional field for schools that are part of a larger system (e.g., school district)
-  facilities: z.array(z.string()).optional(), // Array of facilities (e.g., library, gym, playground)
-  isVerified: z.boolean().optional(), // Whether the school has been verified by the admin
+    .optional(),
+  contactEmail: z.string().email('Invalid email format').optional(),
+  contactPhone: z.string().optional(),
+  principalName: z.string().optional(),
+  schoolType: z.enum(['Public', 'Private', 'Charter', 'Other']).optional(),
+  studentCapacity: z.number().min(1).optional(),
+  logo: z.string().optional(),
+  website: z.string().url().optional(),
+  createdBy: z.string().optional(),
+  country: z.string().min(1).max(50).optional(),
+  state: z.string().min(1).max(50).optional(),
+  city: z.string().min(1).max(50).optional(),
+  postalCode: z.string().min(1).max(20).optional(),
+  accreditationStatus: z.boolean().optional(),
+  parentSchool: z.string().optional(),
+  facilities: z.array(z.string()).optional(),
+  isVerified: z.boolean().optional(),
 });
 
-// Schema for a list of Schools
+// Zod schema for a list of Schools
 export const schoolsSchema = z.array(schoolSchema);
 
 // Infer the TypeScript types from the schemas
-export type School = z.infer<typeof schoolSchema>;
+export type SchoolType = z.infer<typeof schoolSchema>;
 export type Schools = z.infer<typeof schoolsSchema>;
 
-// School Mongoose Schema Definition
-const SchoolSchema: Schema<School> = new Schema(
+// Mongoose Schema for the School model
+const SchoolSchema: Schema<SchoolType> = new Schema(
   {
     name: {
       type: String,
       required: [true, 'School name is required'],
       minlength: 1,
       maxlength: 100,
+    },
+    password: {
+      type: String,
+      required: [true, 'Please provide password'],
+      minlength: 6,
     },
     address: {
       type: String,
@@ -125,8 +131,9 @@ const SchoolSchema: Schema<School> = new Schema(
   }
 );
 
+// Ensure the model is only created once
 const School =
-  (mongoose.models.School as mongoose.Model<School>) ||
+  (mongoose.models.School as mongoose.Model<SchoolType>) ||
   mongoose.model('School', SchoolSchema);
 
 export default School;
