@@ -3,6 +3,7 @@ import CredentialsProvider from 'next-auth/providers/credentials';
 import bcrypt from 'bcryptjs';
 import dbConnect from '@/lib/dbConnect';
 import User from '@/model/User';
+import School from '@/model/School';
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -16,36 +17,82 @@ export const authOptions: NextAuthOptions = {
       async authorize(credentials: any): Promise<any> {
         await dbConnect();
 
+        async function checkUserInMultipleModel(identifier: string) {
+          const [user, school] = await Promise.all([
+            User.findOne({ email: identifier }),
+            School.findOne({ contactEmail: identifier }),
+          ]);
+
+          return user || school || null;
+        }
+
         try {
-          const user = await User.findOne({
-            $or: [
-              { email: credentials.identifier },
-              { username: credentials.identifier },
-            ],
-          });
+          const user = await checkUserInMultipleModel(credentials.identifier);
 
           if (!user) {
-            throw new Error('No user found with this email or username');
+            throw new Error('No user found with this email');
           }
 
-          if (!user.isVerified) {
+          // Handle verification status for found user
+          if (user && !user.isVerified) {
             throw new Error('Please verify your account before login');
           }
 
-          const isPasswordCorrect = await bcrypt.compare(
-            credentials.password,
-            user.password
-          );
+          if (user) {
+            const isPasswordCorrect = await bcrypt.compare(
+              credentials.password,
+              user.password
+            );
 
-          if (isPasswordCorrect) {
-            return user;
-          } else {
-            throw new Error('Incorrect password');
+            if (!isPasswordCorrect) {
+              throw new Error('Incorrect password');
+            }
           }
-        } catch (err: any) {
-          console.error('Error in authorize function:', err.message);
-          throw new Error(err.message);
-        }
+
+          return user;
+        } catch (error) {}
+
+        // try {
+        //   let loginUser;
+        //   const user = await User.findOne({
+        //     $or: [
+        //       { email: credentials.identifier },
+        //       { username: credentials.identifier },
+        //     ],
+        //   });
+
+        //   if (!user) {
+        //     const school = await School.findOne({
+        //       contactEmail: credentials.identifier,
+        //     });
+
+        //     if (school) {
+        //       loginUser = school;
+        //     }
+        //   }
+
+        //   if (!user) {
+        //     throw new Error('No user found with this email or username');
+        //   }
+
+        //   if (!user.isVerified) {
+        //     throw new Error('Please verify your account before login');
+        //   }
+
+        //   const isPasswordCorrect = await bcrypt.compare(
+        //     credentials.password,
+        //     user.password
+        //   );
+
+        //   if (isPasswordCorrect) {
+        //     return user;
+        //   } else {
+        //     throw new Error('Incorrect password');
+        //   }
+        // } catch (err: any) {
+        //   console.error('Error in authorize function:', err.message);
+        //   throw new Error(err.message);
+        // }
       },
     }),
   ],
