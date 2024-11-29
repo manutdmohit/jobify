@@ -84,13 +84,13 @@ const SigninPage = () => {
   };
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gray-100">
-      <div className="w-full max-w-md p-8 space-y-8 bg-white rounded-lg shadow-md mt-10">
+    <div className="flex justify-center items-center min-h-screen bg-white">
+      <div className="w-full max-w-xl p-8 space-y-8 rounded-lg shadow-md mt-10">
         <div className="text-center">
           <h1 className="text-4xl font-extrabold tracking-tight lg:text-5xl mb-6">
-            Join Mystery Message
+            Join Jobify World
           </h1>
-          <p className="mb-4">Sign in to start your anonymous adventure</p>
+          <p className="mb-4">Sign in to start your journey.</p>
         </div>
 
         <Form {...form}>
@@ -135,12 +135,6 @@ const SigninPage = () => {
             </Button>
           </form>
         </Form>
-        <div className="text-center mt-4">
-          <p>Want to be a member?</p>
-          <Link href="/sign-up" className="text-blue-600 hover:text-blue-800">
-            Sign Up
-          </Link>
-        </div>
       </div>
     </div>
   );

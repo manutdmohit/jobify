@@ -55,7 +55,7 @@ export default function Login() {
       <Card className="w-full max-w-sm">
         <CardHeader>
           <CardTitle>Login</CardTitle>
-          <CardDescription>Login to your SupportMe account</CardDescription>
+          <CardDescription>Login to your account</CardDescription>
         </CardHeader>
         <CardContent>
           <Form {...form}>
