@@ -16,7 +16,7 @@ const Navbar = () => {
 
   const user: User = session?.user as User;
 
-  console.log(user?.email);
+  const role = session?.user?.role;
 
   const router = useRouter();
 
@@ -91,23 +91,21 @@ const Navbar = () => {
 
                 {session && (
                   <Link
-                    href="/dashboard"
+                    href={
+                      role === 'admin'
+                        ? '/admin/dashboard'
+                        : role === 'school'
+                        ? '/schools/dashboard'
+                        : '/tutors/dashboard'
+                    }
                     className={`${
-                      pathname === '/dashboard' ? 'bg-black' : ''
+                      pathname === '/admin/dashboard' ||
+                      pathname === '/schools/dashboard'
+                        ? 'bg-black'
+                        : ''
                     } text-white hover:bg-gray-900 hover:text-white rounded-md px-3 py-2`}
                   >
                     Dashboard
-                  </Link>
-                )}
-
-                {session && (
-                  <Link
-                    href="/properties/add"
-                    className={`${
-                      pathname === '/properties/add' ? 'bg-black' : ''
-                    } text-white hover:bg-gray-900 hover:text-white rounded-md px-3 py-2`}
-                  >
-                    Add Property
                   </Link>
                 )}
               </div>
@@ -199,15 +197,7 @@ const Navbar = () => {
                     >
                       Your Profile
                     </Link>
-                    <Link
-                      href="/properties/saved"
-                      className="block px-4 py-2 text-sm text-gray-700"
-                      role="menuitem"
-                      tabIndex={-1}
-                      id="user-menu-item-2"
-                    >
-                      Saved Properties
-                    </Link>
+
                     <button
                       className="block px-4 py-2 text-sm text-gray-700"
                       role="menuitem"
@@ -239,32 +229,44 @@ const Navbar = () => {
             >
               Home
             </Link>
+
             <Link
-              href="/properties"
+              href="/about"
               className={`${
-                pathname === '/properties' ? 'bg-black' : ''
+                pathname === '/about' ? 'bg-black' : ''
               }  text-white block rounded-md px-3 py-2 text-base font-medium`}
             >
-              Properties
+              About
             </Link>
 
-            {isLoggedIn && (
+            {session && (
               <Link
-                href="/properties/add"
+                href={
+                  role === 'admin'
+                    ? '/admin/dashboard'
+                    : role === 'school'
+                    ? '/schools/dashboard'
+                    : '/tutors/dashboard'
+                }
                 className={`${
-                  pathname === '/properties/add' ? 'bg-black' : ''
-                }  text-white block rounded-md px-3 py-2 text-base font-medium`}
+                  pathname === '/admin/dashboard' ||
+                  pathname === '/schools/dashboard'
+                    ? 'bg-black'
+                    : ''
+                } text-white hover:bg-gray-900 hover:text-white rounded-md px-3 py-2`}
               >
-                Add Property
+                Dashboard
               </Link>
             )}
-            {/* 
-            {!isLoggedIn && (
-              <button className="flex items-center text-white bg-gray-700 hover:bg-gray-900 hover:text-white rounded-md px-3 py-2 my-5">
-                <i className="fa-brands fa-google mr-2"></i>
-                <span>Login or Register</span>
+
+            {!session && (
+              <button
+                className="flex items-center text-white bg-gray-700 hover:bg-gray-900 hover:text-white rounded-md px-3 py-2 my-5"
+                onClick={() => router.push('/sign-in')}
+              >
+                <span>Login</span>
               </button>
-            )} */}
+            )}
           </div>
         </div>
       )}
