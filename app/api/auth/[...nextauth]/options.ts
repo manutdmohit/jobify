@@ -102,6 +102,8 @@ export const authOptions: NextAuthOptions = {
         token._id = user._id?.toString();
         token.isVerified = user.isVerified;
         token.role = user?.role;
+        token.fullName = user?.fullName;
+        token.name = user?.name;
       }
       console.log('JWT token:', token);
       return token;
@@ -111,6 +113,8 @@ export const authOptions: NextAuthOptions = {
         session.user._id = token._id;
         session.user.isVerified = token.isVerified;
         session.user.role = token.role;
+        session.user.fullName = token.fullName;
+        session.user.name = token.name;
       }
       console.log('Session:', session);
       return session;
