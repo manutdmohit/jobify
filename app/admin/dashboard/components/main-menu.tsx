@@ -14,7 +14,7 @@ export default function MainMenu({ className }: { className?: String }) {
         <MenuTitle />
       </header>
       <ul className="py-4 grow">
-        <MenuItem href="/dashboard">My dashboard</MenuItem>
+        <MenuItem href="/admin/dashboard">My dashboard</MenuItem>
         <MenuItem href="/admin/dashboard/schools">Schools</MenuItem>
         <MenuItem href="/admin/dashboard/tutors">Tutors</MenuItem>
         <MenuItem href="/admin/dashboard/institutions">Institutions</MenuItem>
