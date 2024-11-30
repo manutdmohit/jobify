@@ -8,6 +8,8 @@ declare module 'next-auth' {
     role?: string;
     isAcceptingMessages?: boolean;
     username?: string;
+    name?: string;
+    fullName?: string;
   }
 
   interface Session {
@@ -17,6 +19,8 @@ declare module 'next-auth' {
       role?: string;
       isAcceptingMessages?: boolean;
       username?: string;
+      name?: string;
+      fullName?: string;
     } & DefaultSession['user'];
   }
 }
@@ -28,5 +32,7 @@ declare module 'next-auth/jwt' {
     role?: string;
     isAcceptingMessages?: boolean;
     username?: string;
+    name?: string;
+    fullName?: string;
   }
 }
