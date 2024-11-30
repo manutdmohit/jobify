@@ -159,14 +159,12 @@ export default function DashboardPage() {
     <Card className="w-full max-w-4xl mx-auto my-5 p-4 sm:p-6 md:p-8">
       <CardHeader>
         <CardTitle className="text-lg sm:text-xl md:text-2xl font-semibold">
-          Dashboard
+          Hi, {session?.user.name || session?.user.fullName || 'School'}
         </CardTitle>
       </CardHeader>
-      <h2 className="text-lg md:text-xl font-bold mt-4">
-        Hi, {session?.user.name || session?.user.fullName || 'School'}
-      </h2>
-      <p className="text-gray-500 text-sm font-bold md:text-base ">
-        {session?.user._id}
+
+      <p className="text-gray-500 text-sm font-bold md:text-base">
+        Your Id: {session?.user._id}
       </p>
       <h2 className="text-lg md:text-xl font-bold mt-6">
         Institution Upcoming Classes
