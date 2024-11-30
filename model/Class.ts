@@ -3,6 +3,7 @@ import { z } from 'zod';
 
 // Zod schema for a single Class
 export const classSchema = z.object({
+  _id: z.string(),
   title: z.string().min(1).max(100).optional(),
   dates: z.array(
     z.object({
