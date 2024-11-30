@@ -4,7 +4,10 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useRouter } from 'next/navigation';
 import { checkSession } from '@/utils/CheckSession';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import { ClassType } from '@/model/Class';
+import axios, { AxiosError } from 'axios';
+import { toast } from '@/components/ui/use-toast';
 
 type ClassStatus =
   | 'confirmed'
@@ -92,15 +95,57 @@ export default function DashboardPage() {
   const session = checkSession();
   const router = useRouter();
 
+  const [classes, setClasses] = useState<ClassType[]>([]);
+
   useEffect(() => {
     if (!session) {
       router.push('/sign-in');
     }
+
+    const fetchClasses = async () => {
+      try {
+        const response = await axios.get('/api/classes');
+
+        if (response.status === 200) {
+          setClasses(response.data);
+        } else {
+          console.log(response.statusText);
+          toast({
+            title: 'Error',
+            description: 'Something went wrong',
+            variant: 'destructive',
+          });
+        }
+      } catch (error: unknown) {
+        if (axios.isAxiosError(error)) {
+          // Axios-specific error handling
+          console.error('Axios error:', error.response?.data || error.message);
+
+          toast({
+            title: 'Error',
+            description:
+              error.response?.data?.message || 'Failed to fetch classes.',
+            variant: 'destructive',
+          });
+        } else {
+          // Generic error handling
+          console.error('Unexpected error:', error);
+
+          toast({
+            title: 'Error',
+            description: 'Something went wrong while fetching classes.',
+            variant: 'destructive',
+          });
+        }
+      }
+    };
+
+    fetchClasses();
   }, [session, router]);
 
   const getClassStatus = (
-    confirmation: string,
-    payment: string
+    confirmation: string | undefined,
+    payment: string | undefined | null
   ): ClassStatus => {
     if (confirmation === 'confirmed' && payment === 'completed')
       return 'confirmed';
@@ -117,14 +162,18 @@ export default function DashboardPage() {
           Dashboard
         </CardTitle>
       </CardHeader>
-      <h2 className="text-lg md:text-xl font-bold mt-4">Hi School</h2>
-      <p className="text-gray-500 text-sm md:text-base">495498584</p>
+      <h2 className="text-lg md:text-xl font-bold mt-4">
+        Hi, {session?.user.name || session?.user.fullName || 'School'}
+      </h2>
+      <p className="text-gray-500 text-sm font-bold md:text-base ">
+        {session?.user._id}
+      </p>
       <h2 className="text-lg md:text-xl font-bold mt-6">
         Institution Upcoming Classes
       </h2>
       <CardContent>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 my-4">
-          {classData.map((classItem, index) => {
+          {classes.map((classItem, index) => {
             const { title, dates, confirmation, payment } = classItem;
             const status = getClassStatus(confirmation, payment);
             const dateStr = dates.map((d) => `${d.day}, ${d.time}`).join(' | ');
@@ -145,7 +194,9 @@ export default function DashboardPage() {
               <Card
                 key={index}
                 className={`${cardClass} hover:scale-105`}
-                onClick={() => router.push('/')}
+                onClick={() =>
+                  router.push(`/schools/dashboard/classes/${classItem._id}`)
+                }
               >
                 <div className="flex flex-col h-full">
                   {/* Content Section */}
@@ -202,12 +253,14 @@ export default function DashboardPage() {
 
         <Button
           className="w-full sm:w-auto px-6 py-2 mt-4"
-          onClick={() => router.push('/sessions/new')}
+          onClick={() => router.push('/schools/dashboard/sessions/new')}
         >
           Request a new session
         </Button>
         <div className="flex flex-col sm:flex-row justify-between gap-4 mt-4">
-          <Button onClick={() => router.push('/sessions/previous')}>
+          <Button
+            onClick={() => router.push(`/schools/dashboard/sessions/previous`)}
+          >
             Previous Sessions
           </Button>
           <Button onClick={() => router.push('/school/profile')}>
