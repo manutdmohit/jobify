@@ -10,6 +10,7 @@ import { FaGoogle } from 'react-icons/fa';
 import { useRouter, usePathname } from 'next/navigation';
 import { signOut, useSession } from 'next-auth/react';
 import { User } from 'next-auth';
+import profileDefault from '@/assets/images/profile.png';
 
 const Navbar = () => {
   const { data: session } = useSession();
@@ -169,12 +170,11 @@ const Navbar = () => {
                   >
                     <span className="absolute -inset-1.5"></span>
                     <span className="sr-only">Open user menu</span>
-                    {/* <Image
+                    <Image
                       className="h-8 w-8 rounded-full"
                       src={profileDefault}
                       alt=""
-                    /> */}
-                    Image
+                    />
                   </button>
                 </div>
 
