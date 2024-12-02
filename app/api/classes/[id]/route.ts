@@ -12,8 +12,6 @@ export const GET = async (
   try {
     const getClass = await Class.findById(params.id);
 
-    console.log(getClass);
-
     if (!getClass) {
       return new Response(
         JSON.stringify({ success: false, message: 'Class not found' }),
